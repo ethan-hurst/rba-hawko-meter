@@ -31,11 +31,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. System ingests ABS Wage Price Index and Building Approvals via readabs
   5. System scrapes CoreLogic and NAB data with fallback to previous week if scrapers fail
   5. All raw data appends to raw_history.csv with timestamped rows
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Foundation scaffolding, shared utilities, RBA and ABS ingestors
+- [ ] 01-02-PLAN.md — Web scrapers (CoreLogic, NAB, ASX Futures)
+- [ ] 01-03-PLAN.md — Pipeline orchestrator, GitHub Actions workflows, historical backfill
 
 ### Phase 2: Core Dashboard
 **Goal**: Users can view current cash rate and historical trends on a live Netlify URL
@@ -109,7 +110,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Data Pipeline | 0/TBD | Not started | - |
+| 1. Foundation & Data Pipeline | 0/3 | Planned | - |
 | 2. Core Dashboard | 0/TBD | Not started | - |
 | 3. Data Normalization & Z-Scores | 0/TBD | Not started | - |
 | 4. Hawk-O-Meter Gauges | 0/TBD | Not started | - |
