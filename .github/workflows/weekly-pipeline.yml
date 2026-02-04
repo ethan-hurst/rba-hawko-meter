@@ -1,0 +1,36 @@
+name: Weekly Data Pipeline
+
+on:
+  schedule:
+    - cron: '7 2 * * 1'       # Monday 2:07 AM UTC (off-peak, avoids :00)
+  workflow_dispatch:            # Manual trigger support
+
+permissions:
+  contents: write              # Required for git-auto-commit-action
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run data pipeline
+        run: python -m pipeline.main
+
+      - name: Commit updated data
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: 'data: weekly pipeline update [skip ci]'
+          file_pattern: 'data/*.csv'
+          commit_user_name: 'github-actions[bot]'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'

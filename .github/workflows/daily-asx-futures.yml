@@ -1,0 +1,36 @@
+name: Daily ASX Futures Scraper
+
+on:
+  schedule:
+    - cron: '23 6 * * 1-5'    # Weekdays 6:23 AM UTC (after AU market close)
+  workflow_dispatch:            # Manual trigger support
+
+permissions:
+  contents: write
+
+jobs:
+  scrape-futures:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Scrape ASX futures
+        run: python -m pipeline.ingest.asx_futures_scraper
+
+      - name: Commit updated data
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: 'data: daily ASX futures update [skip ci]'
+          file_pattern: 'data/asx_futures.csv'
+          commit_user_name: 'github-actions[bot]'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
