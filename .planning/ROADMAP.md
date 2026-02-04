@@ -49,11 +49,11 @@ Plans:
   4. Dashboard is fully responsive on mobile devices with charts stacking appropriately
   5. Every data point displays its source citation (RBA, ABS, CoreLogic, NAB, ASX)
   6. Legal disclaimer ("General Information Only") is visible without scrolling on page load
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Data transform script + HTML structure with dark theme and disclaimer
+- [ ] 02-02-PLAN.md — Interactive JS modules (chart, countdown, data loading) + Netlify deployment
 
 ### Phase 3: Data Normalization & Z-Scores
 **Goal**: System transforms diverse economic metrics into normalized 0-100 gauge values
@@ -111,7 +111,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Pipeline | 0/3 | Planned | - |
-| 2. Core Dashboard | 0/TBD | Not started | - |
+| 2. Core Dashboard | 0/2 | Planned | - |
 | 3. Data Normalization & Z-Scores | 0/TBD | Not started | - |
 | 4. Hawk-O-Meter Gauges | 0/TBD | Not started | - |
 | 5. Calculator & Compliance | 0/TBD | Not started | - |
