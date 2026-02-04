@@ -20,6 +20,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **PIPE-09**: System outputs `status.json` with overall hawk score, per-gauge values, and metadata
 - [ ] **PIPE-10**: GitHub Action runs weekly (Monday) and commits updated data back to repo
 - [ ] **PIPE-11**: System falls back to previous week's data if a scraper fails, logging a warning
+- [ ] **PIPE-12**: System ingests ABS Wage Price Index data via `readabs` (key RBA input for wage pressure)
+- [ ] **PIPE-13**: System ingests ABS Building Approvals data via `readabs` (leading housing supply indicator)
 
 ### Dashboard Display
 
@@ -33,7 +35,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Hawk-O-Meter
 
 - [ ] **HAWK-01**: User can see an overall "Hawk Score" gauge (0-100, traffic light: Blue/Grey/Red)
-- [ ] **HAWK-02**: User can see individual gauges for each metric (Housing, Jobs, Spending, Capacity, Inflation)
+- [ ] **HAWK-02**: User can see individual gauges for each metric (Housing, Jobs, Spending, Capacity, Inflation, Wages)
 - [ ] **HAWK-03**: Each gauge shows a plain-text interpretation (e.g., "Prices rising faster than wages")
 - [ ] **HAWK-04**: User can see ASX Futures implied probability of next rate move
 - [ ] **HAWK-05**: Overall verdict text summarizes the hawk/dove stance in plain English
@@ -86,41 +88,43 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PIPE-01 | — | Pending |
-| PIPE-02 | — | Pending |
-| PIPE-03 | — | Pending |
-| PIPE-04 | — | Pending |
-| PIPE-05 | — | Pending |
-| PIPE-06 | — | Pending |
-| PIPE-07 | — | Pending |
-| PIPE-08 | — | Pending |
-| PIPE-09 | — | Pending |
-| PIPE-10 | — | Pending |
-| PIPE-11 | — | Pending |
-| DASH-01 | — | Pending |
-| DASH-02 | — | Pending |
-| DASH-03 | — | Pending |
-| DASH-04 | — | Pending |
-| DASH-05 | — | Pending |
-| DASH-06 | — | Pending |
-| HAWK-01 | — | Pending |
-| HAWK-02 | — | Pending |
-| HAWK-03 | — | Pending |
-| HAWK-04 | — | Pending |
-| HAWK-05 | — | Pending |
-| CALC-01 | — | Pending |
-| CALC-02 | — | Pending |
-| CALC-03 | — | Pending |
-| CALC-04 | — | Pending |
-| COMP-01 | — | Pending |
-| COMP-02 | — | Pending |
-| COMP-03 | — | Pending |
+| PIPE-01 | Phase 1 | Pending |
+| PIPE-02 | Phase 1 | Pending |
+| PIPE-03 | Phase 1 | Pending |
+| PIPE-04 | Phase 1 | Pending |
+| PIPE-05 | Phase 1 | Pending |
+| PIPE-10 | Phase 1 | Pending |
+| PIPE-11 | Phase 1 | Pending |
+| DASH-01 | Phase 2 | Pending |
+| DASH-02 | Phase 2 | Pending |
+| DASH-03 | Phase 2 | Pending |
+| DASH-04 | Phase 2 | Pending |
+| DASH-05 | Phase 2 | Pending |
+| DASH-06 | Phase 2 | Pending |
+| COMP-03 | Phase 2 | Pending |
+| PIPE-06 | Phase 3 | Pending |
+| PIPE-07 | Phase 3 | Pending |
+| PIPE-08 | Phase 3 | Pending |
+| PIPE-09 | Phase 3 | Pending |
+| HAWK-01 | Phase 4 | Pending |
+| HAWK-02 | Phase 4 | Pending |
+| HAWK-03 | Phase 4 | Pending |
+| HAWK-04 | Phase 4 | Pending |
+| HAWK-05 | Phase 4 | Pending |
+| CALC-01 | Phase 5 | Pending |
+| CALC-02 | Phase 5 | Pending |
+| CALC-03 | Phase 5 | Pending |
+| CALC-04 | Phase 5 | Pending |
+| COMP-01 | Phase 5 | Pending |
+| COMP-02 | Phase 5 | Pending |
+| PIPE-12 | Phase 1 | Pending |
+| PIPE-13 | Phase 1 | Pending |
 
 **Coverage:**
-- v1 requirements: 29 total
-- Mapped to phases: 0
-- Unmapped: 29 ⚠️
+- v1 requirements: 31 total
+- Mapped to phases: 31
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-04 after initial definition*
+*Last updated: 2026-02-04 after roadmap creation*
