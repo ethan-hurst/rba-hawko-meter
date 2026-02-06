@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-04)
 ## Current Position
 
 Phase: 7 of 7 (ASX Futures Integration)
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-02-07 — Completed 07-02-PLAN.md (ASX Futures Normalization Pipeline)
+Plan: 3 of 3 complete
+Status: Phase complete
+Last activity: 2026-02-07 — Completed 07-03-PLAN.md (CI/CD Workflow Updates & Frontend Testing)
 
-Progress: [████████████████████████░░] 93.75% (15/16 plans complete)
+Progress: [██████████████████████████] 100% (16/16 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: 3.0 minutes
-- Total execution time: 0.75 hours
+- Total execution time: 0.8 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [███████████████████████
 | 04 | 2/2 | 4 min | 2.0 min |
 | 05 | 2/2 | 12.5 min | 6.25 min |
 | 06 | 3/3 | 8.8 min | 2.9 min |
-| 07 | 2/3 | 4 min | 2.0 min |
+| 07 | 3/3 | 7 min | 2.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-01 (2 min), 06-03 (3 min), 06-02 (3.8 min), 07-01 (2 min), 07-02 (2 min)
-- Phase 7 in progress - ASX futures pipeline integration complete
+- Last 5 plans: 06-03 (3 min), 06-02 (3.8 min), 07-01 (2 min), 07-02 (2 min), 07-03 (3 min)
+- Phase 7 complete - ASX futures integration end-to-end (scraper → pipeline → frontend + testing)
 
 *Updated after each plan completion*
 
@@ -91,6 +91,9 @@ Recent decisions affecting current work:
 - **Top-level asx_futures key in status.json** (07-02): asx_futures sits at same level as gauges/overall/metadata, NOT inside gauges dict
 - **Direction thresholds for ASX** (07-02): change_bp < -5 → cut, > 5 → hike, else hold (5bp deadband matches probability derivation)
 - **CSV schema validation in ratios.py** (07-02): load_indicator_csv() checks for 'value' column before processing to handle non-standard multi-column formats
+- **Shared data-pipeline concurrency group** (07-03): Daily scraper and weekly pipeline use shared concurrency group with cancel-in-progress: false to prevent simultaneous commits while allowing running jobs to complete
+- **Daily workflow regenerates status.json** (07-03): Daily ASX scraper regenerates status.json after scraping to ensure dashboard reflects latest data immediately
+- **Playwright route interception for testing** (07-03): Use page.route() to mock status.json responses for isolated frontend testing regardless of real data availability
 
 ### Pending Todos
 
@@ -105,7 +108,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-07 21:39 UTC
-Stopped at: Completed 07-02-PLAN.md -- ASX Futures Normalization Pipeline
+Last session: 2026-02-07 21:40 UTC
+Stopped at: Completed 07-03-PLAN.md -- CI/CD Workflow Updates & Frontend Testing
 Resume file: None
-Next: One more plan (07-03) to complete Phase 7. ASX futures data flows from scraper → CSV → status.json. Frontend integration and end-to-end testing remaining.
+Next: All planned work complete (16/16 plans). Phase 7 ASX futures integration complete end-to-end.
