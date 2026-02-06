@@ -27,6 +27,9 @@
     }
   </script>
 
+  <!-- Decimal.js via CDN (financial arithmetic precision) -->
+  <script src="https://cdn.jsdelivr.net/npm/decimal.js@10/decimal.min.js"></script>
+
   <!-- Plotly.js via CDN -->
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 
@@ -122,10 +125,142 @@
       </div>
     </section>
 
-    <!-- Phase 5: Calculator (placeholder) -->
-    <!-- <section aria-label="Mortgage calculator">
-      Mortgage impact calculator will be rendered here in Phase 5.
-    </section> -->
+    <!-- Phase 5: Mortgage Repayment Estimator -->
+    <section id="calculator-section" aria-label="Mortgage Repayment Estimator">
+      <h2 class="text-xl font-semibold text-gray-200 mb-2">Explore Rate Scenarios</h2>
+      <p class="text-sm text-gray-400 mb-4">See how different interest rates could affect a typical Australian mortgage. Adjust the inputs below and use the scenario slider to explore various market conditions.</p>
+
+      <!-- Calculator-specific disclaimer (COMP: Illustrative Estimates Only) -->
+      <div class="border-l-4 border-amber-500/60 bg-amber-500/5 rounded-r-lg px-4 py-3 mb-6">
+        <p class="text-sm text-gray-300">
+          <span class="font-semibold text-amber-400">Illustrative Estimates Only</span> &mdash;
+          This calculator shows how different interest rates affect a typical mortgage.
+          Results are estimates and do not include fees, charges, or rate variations over time.
+          This is not financial advice.
+        </p>
+      </div>
+
+      <!-- Input Form -->
+      <div class="bg-finance-gray border border-finance-border rounded-xl p-5 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+
+          <!-- Loan Amount -->
+          <div>
+            <label for="calc-loan-amount" class="block text-sm font-medium text-gray-300 mb-1">Loan Amount ($)</label>
+            <input type="number" id="calc-loan-amount" min="1000" max="10000000" step="1000" value="600000" required
+              aria-describedby="calc-loan-help"
+              class="w-full bg-[#1a1a1a] text-gray-100 border border-[#2d2d2d] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-finance-accent focus:border-transparent">
+            <p id="calc-loan-help" class="text-xs text-gray-500 mt-1">Average Australian mortgage: ~$600,000</p>
+          </div>
+
+          <!-- Remaining Term -->
+          <div>
+            <label for="calc-term" class="block text-sm font-medium text-gray-300 mb-1">Remaining Term (years)</label>
+            <input type="number" id="calc-term" min="1" max="30" step="1" value="25" required
+              aria-describedby="calc-term-help"
+              class="w-full bg-[#1a1a1a] text-gray-100 border border-[#2d2d2d] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-finance-accent focus:border-transparent">
+            <p id="calc-term-help" class="text-xs text-gray-500 mt-1">Most common: 25 or 30 years</p>
+          </div>
+
+          <!-- Current Interest Rate -->
+          <div>
+            <label for="calc-rate" class="block text-sm font-medium text-gray-300 mb-1">Current Interest Rate (%)</label>
+            <input type="number" id="calc-rate" min="0.01" max="15" step="0.01" value="3.85" required
+              aria-describedby="calc-rate-help"
+              class="w-full bg-[#1a1a1a] text-gray-100 border border-[#2d2d2d] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-finance-accent focus:border-transparent">
+            <p id="calc-rate-help" class="text-xs text-gray-500 mt-1">Current RBA cash rate: 3.85%</p>
+          </div>
+
+          <!-- Repayment Type -->
+          <div>
+            <label for="calc-type" class="block text-sm font-medium text-gray-300 mb-1">Repayment Type</label>
+            <select id="calc-type"
+              class="w-full bg-[#1a1a1a] text-gray-100 border border-[#2d2d2d] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-finance-accent focus:border-transparent">
+              <option value="PI" selected>Principal &amp; Interest</option>
+              <option value="IO">Interest Only</option>
+            </select>
+          </div>
+
+          <!-- Repayment Frequency -->
+          <div>
+            <label for="calc-frequency" class="block text-sm font-medium text-gray-300 mb-1">Repayment Frequency</label>
+            <select id="calc-frequency"
+              class="w-full bg-[#1a1a1a] text-gray-100 border border-[#2d2d2d] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-finance-accent focus:border-transparent">
+              <option value="monthly" selected>Monthly</option>
+              <option value="fortnightly">Fortnightly</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Scenario Slider -->
+        <div class="mb-6">
+          <label for="calc-slider" class="block text-sm font-medium text-gray-300 mb-2">Scenario Interest Rate</label>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-gray-500 w-8 text-right">0%</span>
+            <input type="range" id="calc-slider" min="0" max="10" step="0.25" value="3.85"
+              aria-valuemin="0" aria-valuemax="10" aria-valuenow="3.85" aria-valuetext="3.85 percent"
+              class="flex-1 h-2 rounded-lg appearance-none cursor-pointer accent-finance-accent bg-[#2d2d2d]">
+            <span class="text-xs text-gray-500 w-8">10%</span>
+            <output id="calc-slider-output" for="calc-slider" aria-live="polite" class="text-sm font-semibold text-finance-accent w-14 text-center">3.85%</output>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Slide to explore: What if rates were a different percentage?</p>
+        </div>
+
+        <!-- Results Area -->
+        <div id="calc-results" aria-live="polite">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Current Repayment -->
+            <div class="bg-[#111] rounded-lg p-4 text-center">
+              <p class="text-xs text-gray-500 uppercase tracking-widest mb-1">Current Repayment</p>
+              <p id="calc-current-payment" class="text-2xl sm:text-3xl font-bold text-white tabular-nums">--</p>
+              <p id="calc-current-rate-label" class="text-sm text-gray-400 mt-1">at --%</p>
+              <p id="calc-current-freq-label" class="text-xs text-gray-500">per month</p>
+            </div>
+            <!-- Scenario Repayment -->
+            <div class="bg-[#111] rounded-lg p-4 text-center">
+              <p class="text-xs text-gray-500 uppercase tracking-widest mb-1">Scenario Repayment</p>
+              <p id="calc-scenario-payment" class="text-2xl sm:text-3xl font-bold text-finance-accent tabular-nums">--</p>
+              <p id="calc-scenario-rate-label" class="text-sm text-gray-400 mt-1">at --%</p>
+              <p id="calc-scenario-freq-label" class="text-xs text-gray-500">per month</p>
+            </div>
+          </div>
+
+          <!-- Difference Highlight -->
+          <div class="flex flex-col sm:flex-row gap-3 justify-center text-center mb-6">
+            <div class="bg-[#111] rounded-lg px-4 py-2">
+              <p class="text-xs text-gray-500 mb-0.5">Difference per period</p>
+              <p id="calc-diff-per-period" class="text-lg font-semibold text-gray-400">$0.00</p>
+            </div>
+            <div class="bg-[#111] rounded-lg px-4 py-2">
+              <p class="text-xs text-gray-500 mb-0.5">Annual difference</p>
+              <p id="calc-diff-annual" class="text-lg font-semibold text-gray-400">$0.00</p>
+            </div>
+          </div>
+
+          <!-- Comparison Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <caption class="text-sm font-medium text-gray-300 mb-2 text-left">Scenario Comparison</caption>
+              <thead>
+                <tr class="border-b border-finance-border">
+                  <th scope="col" class="px-4 py-2 text-xs text-gray-500 uppercase tracking-widest font-medium">Interest Rate</th>
+                  <th scope="col" class="px-4 py-2 text-xs text-gray-500 uppercase tracking-widest font-medium">Repayment</th>
+                  <th scope="col" class="px-4 py-2 text-xs text-gray-500 uppercase tracking-widest font-medium">Annual Cost</th>
+                  <th scope="col" class="px-4 py-2 text-xs text-gray-500 uppercase tracking-widest font-medium">Difference</th>
+                </tr>
+              </thead>
+              <tbody id="calc-table-body" class="divide-y divide-finance-border">
+                <tr><td colspan="4" class="px-4 py-3 text-sm text-gray-500">Calculating...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Source citation -->
+      <p class="text-xs text-gray-600 mt-2">Calculations based on standard amortization formula. Interest rate data: Reserve Bank of Australia.</p>
+    </section>
 
   </main>
 
@@ -172,6 +307,8 @@
   <script src="js/data.js"></script>
   <script src="js/chart.js"></script>
   <script src="js/countdown.js"></script>
+  <!-- Calculator Module (created in Plan 05-01) -->
+  <script src="js/calculator.js"></script>
   <script src="js/main.js"></script>
   <!-- Gauge Modules (created in Plan 04-01/04-02) -->
   <script src="js/gauges.js"></script>
