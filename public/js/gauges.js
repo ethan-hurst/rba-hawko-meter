@@ -42,7 +42,7 @@ var GaugesModule = (function () {
   /**
    * Get the stance label for a given gauge value.
    * @param {number} value - Gauge value 0-100
-   * @returns {string} Stance label e.g. 'HAWKISH'
+   * @returns {string} Stance label e.g. 'LEANING TOWARDS RISES'
    */
   function getStanceLabel(value) {
     var v = Math.max(0, Math.min(100, value));
