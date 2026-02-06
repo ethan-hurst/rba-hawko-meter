@@ -126,3 +126,87 @@ SOURCE_METADATA = {
         "description": "Building Approvals",
     },
 }
+
+
+# =============================================================================
+# Phase 3: Normalization engine configuration
+# =============================================================================
+
+# Indicator configuration for normalization pipeline
+# Maps each indicator to its CSV file, normalization method, and parameters
+INDICATOR_CONFIG = {
+    "inflation": {
+        "csv_file": "abs_cpi.csv",
+        "normalize": "yoy_pct_change",
+        "frequency": "quarterly",
+        "yoy_periods": 4,
+        "description": "Consumer Price Index YoY % change",
+    },
+    "wages": {
+        "csv_file": "abs_wage_price_index.csv",
+        "normalize": "yoy_pct_change",
+        "frequency": "quarterly",
+        "yoy_periods": 4,
+        "description": "Wage Price Index YoY % change",
+    },
+    "employment": {
+        "csv_file": "abs_employment.csv",
+        "normalize": "yoy_pct_change",
+        "frequency": "monthly",
+        "yoy_periods": 12,
+        "description": "Labour force YoY % change",
+    },
+    "spending": {
+        "csv_file": "abs_retail_trade.csv",
+        "normalize": "yoy_pct_change",
+        "frequency": "monthly",
+        "yoy_periods": 12,
+        "description": "Retail trade turnover YoY % change",
+    },
+    "building_approvals": {
+        "csv_file": "abs_building_approvals.csv",
+        "normalize": "yoy_pct_change",
+        "frequency": "monthly",
+        "yoy_periods": 12,
+        "description": "Building approvals YoY % change",
+    },
+}
+
+# Optional indicators (stubs -- csv_file=None until scrapers implemented)
+OPTIONAL_INDICATOR_CONFIG = {
+    "housing": {
+        "csv_file": None,
+        "normalize": "yoy_pct_change",
+        "frequency": "monthly",
+        "yoy_periods": 12,
+        "description": "Housing prices YoY % change",
+    },
+    "business_confidence": {
+        "csv_file": None,
+        "normalize": "direct",
+        "frequency": "quarterly",
+        "yoy_periods": None,
+        "description": "NAB Business Confidence index",
+    },
+    "asx_futures": {
+        "csv_file": None,
+        "normalize": "direct",
+        "frequency": "monthly",
+        "yoy_periods": None,
+        "description": "ASX implied futures rate",
+    },
+}
+
+# Z-score computation parameters
+ZSCORE_WINDOW_YEARS = 10
+ZSCORE_MIN_YEARS = 5
+ZSCORE_CLAMP_MIN = -3.0
+ZSCORE_CLAMP_MAX = 3.0
+
+# Confidence thresholds (in quarterly observations)
+CONFIDENCE_HIGH_MIN_OBS = 32   # 8 years quarterly
+CONFIDENCE_MEDIUM_MIN_OBS = 20  # 5 years quarterly
+
+# Output paths
+WEIGHTS_FILE = DATA_DIR / "weights.json"
+STATUS_OUTPUT = Path("public") / "data" / "status.json"

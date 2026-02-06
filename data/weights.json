@@ -1,0 +1,50 @@
+{
+  "inflation": {
+    "weight": 0.25,
+    "polarity": 1,
+    "label": "Inflation (CPI)",
+    "description": "Primary RBA mandate. CPI YoY % change is the most direct measure of price stability."
+  },
+  "wages": {
+    "weight": 0.15,
+    "polarity": 1,
+    "label": "Wages (WPI)",
+    "description": "Key input to inflation expectations. Sustained wage growth above productivity signals inflationary pressure."
+  },
+  "employment": {
+    "weight": 0.15,
+    "polarity": 1,
+    "label": "Employment",
+    "description": "RBA dual mandate: full employment. Tight labour markets signal demand-pull inflation."
+  },
+  "housing": {
+    "weight": 0.15,
+    "polarity": 1,
+    "label": "Housing",
+    "description": "Financial stability concern. Rising prices increase household leverage and wealth effects on spending."
+  },
+  "spending": {
+    "weight": 0.10,
+    "polarity": 1,
+    "label": "Retail Trade",
+    "description": "Consumer demand pressure. Strong retail growth signals demand-driven inflation."
+  },
+  "building_approvals": {
+    "weight": 0.05,
+    "polarity": 1,
+    "label": "Building Approvals",
+    "description": "Leading indicator for construction activity and housing supply. Noisy but directionally useful."
+  },
+  "business_confidence": {
+    "weight": 0.05,
+    "polarity": 1,
+    "label": "Business Confidence",
+    "description": "Forward-looking sentiment. High confidence signals expanding demand and potential pricing pressure."
+  },
+  "asx_futures": {
+    "weight": 0.10,
+    "polarity": 1,
+    "label": "ASX Futures",
+    "description": "Market-implied rate expectations. Displayed as benchmark, excluded from hawk score calculation."
+  }
+}
