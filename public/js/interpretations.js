@@ -19,6 +19,36 @@ var InterpretationsModule = (function () {
     maximumFractionDigits: 1
   });
 
+  var ausDateFormatter = new Intl.DateTimeFormat('en-AU', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  });
+
+  /**
+   * Check if metric data contains suspect/bogus values.
+   * @param {string} metricId - Metric identifier
+   * @param {Object} metricData - Metric data object
+   * @returns {boolean} True if data is suspect
+   */
+  function isDataSuspect(metricId, metricData) {
+    if (metricId === 'building_approvals') {
+      var raw = parseFloat(metricData.raw_value);
+      if (isNaN(raw) || raw < -90 || raw > 500) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Format ISO date string as Australian format (1 Dec 2025).
+   * @param {string} isoDateStr - ISO 8601 date string
+   * @returns {string} Formatted date
+   */
+  function formatAusDate(isoDateStr) {
+    if (!isoDateStr) return 'unknown';
+    var d = new Date(isoDateStr);
+    if (isNaN(d.getTime())) return isoDateStr;
+    return ausDateFormatter.format(d);
+  }
+
   /**
    * Render overall verdict text with colored stance label.
    * @param {string} containerId - DOM element ID
@@ -186,49 +216,92 @@ var InterpretationsModule = (function () {
    * @returns {string} Plain text interpretation
    */
   function generateMetricInterpretation(metricId, metricData) {
+    // Data quality guard
+    if (isDataSuspect(metricId, metricData)) {
+      return 'Building approvals data is currently being updated';
+    }
+
     var v = metricData.value;
     var raw = metricData.raw_value != null ? parseFloat(metricData.raw_value).toFixed(1) : '?';
-    var unit = metricData.raw_unit || '';
 
     switch (metricId) {
       case 'inflation':
-        if (v < 40) return 'CPI at ' + raw + unit + ' \u2014 within or below 2-3% target band';
-        if (v <= 60) return 'CPI at ' + raw + unit + ' \u2014 near top of 2-3% target band';
-        return 'CPI at ' + raw + unit + ' \u2014 above 2-3% target band';
+        if (v < 40) return 'Prices up ' + raw + '% over the past year \u2014 within the RBA\'s 2\u20133% target';
+        if (v <= 60) return 'Prices up ' + raw + '% over the past year \u2014 near the top of the RBA\'s 2\u20133% target';
+        return 'Prices up ' + raw + '% over the past year \u2014 above the RBA\'s 2\u20133% target';
 
       case 'wages':
-        if (v < 40) return 'Wages growing ' + raw + unit + ' \u2014 subdued growth';
-        if (v <= 60) return 'Wages growing ' + raw + unit + ' \u2014 moderate growth';
-        return 'Wages growing ' + raw + unit + ' \u2014 strong growth adding to cost pressure';
+        if (v < 40) return 'Wages up ' + raw + '% over the past year \u2014 growing slowly';
+        if (v <= 60) return 'Wages up ' + raw + '% over the past year \u2014 moderate growth';
+        return 'Wages up ' + raw + '% over the past year \u2014 growing fast, which can push up prices';
 
       case 'building_approvals':
-        if (v < 40) return 'Building approvals at ' + raw + unit + ' \u2014 below trend, easing construction pressure';
-        if (v <= 60) return 'Building approvals at ' + raw + unit + ' \u2014 near long-run average';
-        return 'Building approvals at ' + raw + unit + ' \u2014 above trend, adding to demand pressure';
+        if (v < 40) return 'New building approvals are below average \u2014 a sign of slowing construction';
+        if (v <= 60) return 'New building approvals are near average levels';
+        return 'New building approvals are above average \u2014 a sign of strong construction demand';
 
       case 'housing':
-        if (v < 40) return 'Housing prices at ' + raw + unit + ' \u2014 easing affordability pressure';
-        if (v <= 60) return 'Housing prices at ' + raw + unit + ' \u2014 stable';
-        return 'Housing prices at ' + raw + unit + ' \u2014 elevated affordability pressure';
+        if (v < 40) return 'House prices are easing \u2014 less pressure on affordability';
+        if (v <= 60) return 'House prices are growing at a moderate pace';
+        return 'House prices are rising strongly \u2014 adding to affordability pressure';
 
       case 'employment':
-        if (v < 40) return 'Labour market at ' + raw + unit + ' \u2014 softening conditions';
-        if (v <= 60) return 'Labour market at ' + raw + unit + ' \u2014 balanced conditions';
-        return 'Labour market at ' + raw + unit + ' \u2014 tight conditions adding to wage pressure';
+        if (v < 40) return 'The job market is softening \u2014 fewer new jobs being created';
+        if (v <= 60) return 'The job market is steady \u2014 balanced conditions';
+        return 'The job market is very tight \u2014 lots of demand for workers, which can push up wages';
 
       case 'spending':
-        if (v < 40) return 'Consumer spending at ' + raw + unit + ' \u2014 subdued demand';
-        if (v <= 60) return 'Consumer spending at ' + raw + unit + ' \u2014 moderate demand';
-        return 'Consumer spending at ' + raw + unit + ' \u2014 strong demand adding to price pressure';
+        if (v < 40) return 'Consumer spending is subdued \u2014 people are holding back';
+        if (v <= 60) return 'Consumer spending is at moderate levels';
+        return 'Consumer spending is strong \u2014 which can push up prices';
 
       case 'business_confidence':
-        if (v < 40) return 'Business confidence at ' + raw + unit + ' \u2014 below average';
-        if (v <= 60) return 'Business confidence at ' + raw + unit + ' \u2014 near long-term average';
-        return 'Business confidence at ' + raw + unit + ' \u2014 above average';
+        if (v < 40) return 'Business confidence is below average \u2014 businesses are cautious';
+        if (v <= 60) return 'Business confidence is around average levels';
+        return 'Business confidence is high \u2014 businesses are investing and hiring more';
 
       default:
-        return metricData.interpretation || (GaugesModule.getDisplayLabel(metricId) + ': ' + raw + unit);
+        return metricData.interpretation || GaugesModule.getDisplayLabel(metricId);
     }
+  }
+
+  /**
+   * Get plain English explanation for why this indicator matters.
+   * @param {string} metricId - Metric identifier
+   * @returns {string|null} Explanation text or null
+   */
+  function getWhyItMatters(metricId) {
+    var reasons = {
+      inflation: 'When prices rise too fast, the RBA tends to raise interest rates to slow things down.',
+      wages: 'Rising wages can push up prices, which can lead the RBA to raise rates.',
+      building_approvals: 'Fewer approvals signals a slowing economy, which may support rate cuts.',
+      housing: 'Rapidly rising house prices can prompt the RBA to raise rates to cool the market.',
+      employment: 'Low unemployment means a strong economy, which can lead to rate rises.',
+      spending: 'When consumers spend more, it can push prices up and lead to rate rises.',
+      business_confidence: 'When businesses are confident, they invest and hire more, adding to inflation pressure.'
+    };
+    return reasons[metricId] || null;
+  }
+
+  /**
+   * Get plain English verdict text based on hawk score.
+   * @param {number} score - Overall hawk score (0-100)
+   * @returns {string} ASIC-compliant verdict text
+   */
+  function getPlainVerdict(score) {
+    if (score < 20) {
+      return 'The economy is showing significant signs of slowing. Interest rates are more likely to come down.';
+    }
+    if (score < 40) {
+      return 'The economy is showing some signs of easing. Interest rates may be more likely to fall than rise.';
+    }
+    if (score <= 60) {
+      return 'The economy is giving mixed signals. Interest rates are likely to stay where they are for now.';
+    }
+    if (score <= 80) {
+      return 'The economy is running warm. Interest rates may be more likely to rise than fall.';
+    }
+    return 'The economy is running hot. Interest rates are more likely to go up.';
   }
 
   /**
@@ -307,6 +380,10 @@ var InterpretationsModule = (function () {
     renderASXTable: renderASXTable,
     renderStalenessWarning: renderStalenessWarning,
     generateMetricInterpretation: generateMetricInterpretation,
-    renderMetricCard: renderMetricCard
+    renderMetricCard: renderMetricCard,
+    getWhyItMatters: getWhyItMatters,
+    getPlainVerdict: getPlainVerdict,
+    formatAusDate: formatAusDate,
+    isDataSuspect: isDataSuspect
   };
 })();
