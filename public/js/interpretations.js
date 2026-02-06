@@ -62,18 +62,22 @@ var InterpretationsModule = (function () {
     if (!container) return;
     container.textContent = '';
 
-    var heading = document.createElement('h3');
-    heading.className = 'text-lg font-semibold text-gray-200 mb-3';
-    heading.textContent = 'ASX Futures \u2014 Next Meeting';
-    container.appendChild(heading);
-
     if (!asxData || !asxData.probabilities) {
-      var unavail = document.createElement('p');
-      unavail.className = 'text-gray-500 text-sm';
-      unavail.textContent = 'ASX Futures data unavailable';
-      container.appendChild(unavail);
+      container.style.display = 'none';
       return;
     }
+
+    container.style.display = '';
+
+    var heading = document.createElement('h3');
+    heading.className = 'text-lg font-semibold text-gray-200 mb-3';
+    heading.textContent = 'What Markets Expect';
+    container.appendChild(heading);
+
+    var subline = document.createElement('p');
+    subline.className = 'text-xs text-gray-500 mb-3';
+    subline.textContent = 'Based on ASX 30 Day Interbank Cash Rate Futures pricing';
+    container.appendChild(subline);
 
     var probs = asxData.probabilities;
     var outcomes = [

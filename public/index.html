@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RBA Hawk-O-Meter | Interest Rate Dashboard</title>
-  <meta name="description" content="Automated, unbiased economic dashboard visualizing Australian interest rate pressure. Data, not opinion.">
+  <title>RBA Hawk-O-Meter | Are Australian interest rates going up or down?</title>
+  <meta name="description" content="Free tool tracking economic data to show whether Australian interest rates are likely to rise, fall, or stay the same. Updated automatically.">
 
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -103,7 +103,7 @@
         </div>
         <div class="lg:col-span-2 space-y-4">
           <div id="asx-futures-container" class="bg-finance-gray rounded-lg p-5 border border-finance-border">
-            <h3 class="text-lg font-semibold text-gray-200 mb-3">ASX Futures &mdash; Next Meeting</h3>
+            <h3 class="text-lg font-semibold text-gray-200 mb-3">What Markets Expect</h3>
             <div class="text-gray-500 text-sm">Loading futures data...</div>
           </div>
           <!-- Cash Rate Display (preserved from Phase 2) -->
@@ -120,6 +120,7 @@
       <div id="verdict-container" class="mt-6 text-center text-lg">
         <span class="text-gray-500">Loading verdict...</span>
       </div>
+      <div id="calculator-jump-link" class="mt-3 text-center"></div>
       <p id="scale-explainer" class="mt-2 text-center text-sm text-gray-500">
         Score out of 100. Below 50 = pressure to cut rates. Above 50 = pressure to raise rates.
       </p>
