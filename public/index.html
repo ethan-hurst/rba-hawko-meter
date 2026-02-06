@@ -66,31 +66,35 @@
   <!-- Main Content -->
   <main class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-8 py-8 space-y-10">
 
-    <!-- Hero Section: Gauge Placeholder + Cash Rate -->
-    <section aria-label="Overview">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-
-        <!-- Gauge Placeholder (Phase 4) -->
-        <div class="flex items-center justify-center">
-          <div class="w-64 h-40 sm:w-80 sm:h-48 border-2 border-dashed border-finance-border rounded-xl flex flex-col items-center justify-center text-gray-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 text-finance-border" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            <p class="text-sm">Hawk-O-Meter Gauge</p>
-            <p class="text-xs text-gray-600 mt-1">Coming in Phase 4</p>
+    <!-- Hero Section: Hawk-O-Meter Gauge + ASX Futures + Cash Rate -->
+    <section id="hawk-o-meter-section" aria-label="Overview" class="mb-8">
+      <div id="data-freshness" class="text-center text-sm mb-2"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+        <div class="lg:col-span-3">
+          <div id="hero-gauge-plot" class="w-full" style="min-height: 280px;">
+            <div class="flex items-center justify-center h-64 text-gray-500">
+              Loading Hawk Score...
+            </div>
           </div>
         </div>
-
-        <!-- Cash Rate Display -->
-        <div class="text-center md:text-left">
-          <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">RBA Cash Rate</p>
-          <p id="cash-rate-value" class="text-5xl sm:text-6xl lg:text-7xl font-bold text-white tabular-nums">
-            --
-          </p>
-          <p id="cash-rate-updated" class="text-sm text-gray-500 mt-2">Loading...</p>
-          <p class="text-xs text-gray-600 mt-1">Source: Reserve Bank of Australia</p>
+        <div class="lg:col-span-2 space-y-4">
+          <div id="asx-futures-container" class="bg-finance-gray rounded-lg p-5 border border-finance-border">
+            <h3 class="text-lg font-semibold text-gray-200 mb-3">ASX Futures &mdash; Next Meeting</h3>
+            <div class="text-gray-500 text-sm">Loading futures data...</div>
+          </div>
+          <!-- Cash Rate Display (preserved from Phase 2) -->
+          <div class="bg-finance-gray rounded-lg p-5 border border-finance-border text-center lg:text-left">
+            <p class="text-sm text-gray-400 uppercase tracking-widest mb-2">RBA Cash Rate</p>
+            <p id="cash-rate-value" class="text-4xl sm:text-5xl font-bold text-white tabular-nums">
+              --
+            </p>
+            <p id="cash-rate-updated" class="text-sm text-gray-500 mt-2">Loading...</p>
+            <p class="text-xs text-gray-600 mt-1">Source: Reserve Bank of Australia</p>
+          </div>
         </div>
-
+      </div>
+      <div id="verdict-container" class="mt-6 text-center text-lg">
+        <span class="text-gray-500">Loading verdict...</span>
       </div>
     </section>
 
@@ -108,11 +112,15 @@
       <p id="chart-source" class="text-xs text-gray-600 mt-2">Source: Reserve Bank of Australia</p>
     </section>
 
-    <!-- Phase 4: Individual Gauges (placeholder) -->
-    <!-- <section aria-label="Economic indicators">
-      Individual metric gauges will be rendered here in Phase 4.
-      Housing, Jobs, Spending, Capacity, Inflation, Wages
-    </section> -->
+    <!-- Individual Economic Indicator Gauges -->
+    <section id="individual-gauges-section" aria-label="Economic indicators" class="mb-8">
+      <h2 class="text-xl font-semibold text-gray-200 mb-4">Economic Indicators</h2>
+      <div id="metric-gauges-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="col-span-full text-center text-gray-500 py-8">
+          Loading economic indicators...
+        </div>
+      </div>
+    </section>
 
     <!-- Phase 5: Calculator (placeholder) -->
     <!-- <section aria-label="Mortgage calculator">
@@ -165,6 +173,10 @@
   <script src="js/chart.js"></script>
   <script src="js/countdown.js"></script>
   <script src="js/main.js"></script>
+  <!-- Gauge Modules (created in Plan 04-01/04-02) -->
+  <script src="js/gauges.js"></script>
+  <script src="js/interpretations.js"></script>
+  <script src="js/gauge-init.js"></script>
 
 </body>
 </html>
