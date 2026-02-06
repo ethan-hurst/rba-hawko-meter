@@ -141,3 +141,64 @@ def normalize_indicator(name, config):
 
     # Return only date and value columns
     return df[['date', 'value']].reset_index(drop=True)
+
+
+def load_asx_futures_csv(csv_path):
+    """
+    Read the ASX futures multi-column CSV and return the latest row's data.
+
+    The CSV has schema:
+    date,meeting_date,implied_rate,change_bp,probability_cut,probability_hold,probability_hike
+
+    Unlike standard indicator CSVs (date,value), this CSV has multiple columns
+    with meeting-specific data. We find the row for the next upcoming meeting.
+
+    Args:
+        csv_path: Path to asx_futures.csv.
+
+    Returns:
+        Dict with keys matching status.json asx_futures contract, or None if
+        file missing/empty/unparseable.
+    """
+    path = Path(csv_path)
+    if not path.exists():
+        print(f"  ASX futures CSV not found: {path}")
+        return None
+
+    df = pd.read_csv(path)
+    if df.empty:
+        print("  ASX futures CSV is empty")
+        return None
+
+    # Parse dates
+    df['date'] = pd.to_datetime(df['date'])
+    df['meeting_date'] = pd.to_datetime(df['meeting_date'])
+
+    # Sort by date descending to get the most recent scrape
+    df = df.sort_values('date', ascending=False)
+
+    # Get the latest scrape date
+    latest_date = df['date'].iloc[0]
+    latest_rows = df[df['date'] == latest_date]
+
+    # From the latest scrape, find the next upcoming meeting
+    # (meeting_date >= today)
+    today = pd.Timestamp.now().normalize()
+    future_meetings = latest_rows[latest_rows['meeting_date'] >= today]
+
+    if future_meetings.empty:
+        # All meetings in the past -- use the latest meeting as fallback
+        next_meeting_row = latest_rows.iloc[0]
+    else:
+        # Pick the nearest future meeting
+        next_meeting_row = future_meetings.sort_values('meeting_date').iloc[0]
+
+    return {
+        'data_date': latest_date.strftime('%Y-%m-%d'),
+        'meeting_date': next_meeting_row['meeting_date'].strftime('%Y-%m-%d'),
+        'implied_rate': float(next_meeting_row['implied_rate']),
+        'change_bp': float(next_meeting_row['change_bp']),
+        'probability_cut': float(next_meeting_row['probability_cut']),
+        'probability_hold': float(next_meeting_row['probability_hold']),
+        'probability_hike': float(next_meeting_row['probability_hike']),
+    }
