@@ -14,8 +14,8 @@ test.describe('Phase 4 — Hawk-O-Meter Gauges', () => {
     const svg = heroPlot.locator('svg.main-svg');
     await expect(svg.first()).toBeVisible({ timeout: 15000 });
 
-    // Hawk score "48/100" should be visible in the rendered gauge (47.5 rounds to 48)
-    await expect(heroPlot).toContainText('48/100');
+    // Hawk score "41/100" should be visible in the rendered gauge (41.3 rounds to 41)
+    await expect(heroPlot).toContainText('41/100');
 
     // Stance label "HOLDING STEADY" should be visible (score 46 falls in 40-60 range)
     await expect(heroPlot).toContainText('HOLDING STEADY');
@@ -35,8 +35,8 @@ test.describe('Phase 4 — Hawk-O-Meter Gauges', () => {
     // Each card should have interpretation text with real numbers
     const cards = allCards;
 
-    // Inflation card: "Prices up 1.4" (raw_value 1.43 rounded to 1 decimal)
-    await expect(cards.nth(0)).toContainText('Prices up 1.4');
+    // Inflation card: "Prices up 3.8" (raw_value 3.76 rounded to 1 decimal)
+    await expect(cards.nth(0)).toContainText('Prices up 3.8');
 
     // Wages card: "Wages up 1.6" (raw_value 1.56)
     await expect(cards.nth(1)).toContainText('Wages up 1.6');

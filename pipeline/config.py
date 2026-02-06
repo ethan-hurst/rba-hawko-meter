@@ -137,8 +137,8 @@ INDICATOR_CONFIG = {
     "inflation": {
         "csv_file": "abs_cpi.csv",
         "normalize": "yoy_pct_change",
-        "frequency": "quarterly",
-        "yoy_periods": 4,
+        "frequency": "monthly",
+        "yoy_periods": 12,
         "description": "Consumer Price Index YoY % change",
     },
     "wages": {
