@@ -18,6 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Hawk-O-Meter Gauges** - Traffic-light visualization system
 - [x] **Phase 5: Calculator & Compliance** - Mortgage calculator and regulatory polish
 - [x] **Phase 6: UX & Plain English Overhaul** - Transform jargon to layman-friendly language
+- [x] **Phase 7: ASX Futures Integration** - Live market expectations from ASX Rate Tracker API
 
 ## Phase Details
 
@@ -125,6 +126,23 @@ Plans:
 - [ ] 06-02-PLAN.md — Interpretation rewrites, data quality guards, weight badges, stale labels (P0/P1)
 - [ ] 06-03-PLAN.md — Information architecture improvements, calculator bridge, mobile UX, meta tags (P1/P2)
 
+### Phase 7: ASX Futures Integration
+**Goal**: Dashboard displays live ASX futures implied rates and market expectations for the next RBA meeting
+**Depends on**: Phase 1, Phase 3, Phase 4
+**Requirements**: HAWK-04
+**Success Criteria** (what must be TRUE):
+  1. Scraper fetches implied cash rates from ASX DAM JSON endpoints without browser rendering
+  2. status.json contains a top-level `asx_futures` key with current rate, implied rate, probability, and direction
+  3. Daily GitHub Action successfully fetches and commits ASX futures data
+  4. Weekly pipeline regenerates status.json including ASX futures entry
+  5. Frontend "What Markets Expect" section renders live data instead of placeholder
+**Plans**: 3 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — ASX futures scraper rewrite using JSON API endpoints
+- [ ] 07-02-PLAN.md — Pipeline integration: normalization loader, engine entry builder, config updates
+- [ ] 07-03-PLAN.md — CI/CD workflow updates and testing
+
 ## Progress
 
 **Execution Order:**
@@ -138,3 +156,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 4. Hawk-O-Meter Gauges | 2/2 | Complete | 2026-02-06 |
 | 5. Calculator & Compliance | 2/2 | Complete | 2026-02-06 |
 | 6. UX & Plain English Overhaul | 3/3 | Complete | 2026-02-06 |
+| 7. ASX Futures Integration | 3/3 | Complete | 2026-02-07 |
