@@ -6,9 +6,8 @@ Runs all data ingestors in two phases:
 2. OPTIONAL sources (CoreLogic, NAB) - graceful degradation
 
 Exit codes:
-- 0: All sources succeeded
+- 0: All critical sources succeeded (optional failures are non-fatal)
 - 1: Critical source failed (pipeline failed)
-- 2: Optional source(s) failed (partial success)
 """
 
 import sys
@@ -188,8 +187,8 @@ if __name__ == '__main__':
     print(json.dumps(results, indent=2))
 
     # Exit with appropriate code
-    if results['status'] == 'success':
+    # 0 = success or partial (critical sources OK, optional failures are non-fatal)
+    # 1 = critical source failure (already exits early in run_pipeline)
+    if results['status'] in ('success', 'partial'):
         sys.exit(0)
-    elif results['status'] == 'partial':
-        sys.exit(2)
     # Failed status already exits with code 1 in run_pipeline()
