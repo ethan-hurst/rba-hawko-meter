@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** "Data, not opinion." Empowers laypeople to understand interest rate drivers without relying on media sensationalism or biased advice.
-**Current focus:** Phase 4 - Hawk-O-Meter Gauges (complete)
+**Current focus:** Phase 5 - Calculator & Compliance (complete)
 
 ## Current Position
 
-Phase: 4 of 5 (Hawk-O-Meter Gauges)
+Phase: 5 of 5 (Calculator & Compliance)
 Plan: 2 of 2 complete
 Status: Phase complete
-Last activity: 2026-02-06 — Completed 04-02-PLAN.md (Individual Metric Bullet Gauges)
+Last activity: 2026-02-06 — Completed 05-02-PLAN.md (ASIC Compliance Audit)
 
-Progress: [████████████████████░░] 90% (9/10 plans complete, excluding Phase 1 gap closure)
+Progress: [████████████████████████] 100% (10/10 plans complete, excluding Phase 1 gap closure)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 10
 - Average duration: 3.5 minutes
-- Total execution time: 0.47 hours
+- Total execution time: 0.58 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [████████████████████░░] 9
 | 01 | 4/5 | 18.4 min | 4.6 min |
 | 03 | 2/2 | 6 min | 3.0 min |
 | 04 | 2/2 | 4 min | 2.0 min |
+| 05 | 2/2 | 12.5 min | 6.25 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (3 min), 03-02 (3 min), 04-01 (2 min), 04-02 (2 min)
-- Trend: Accelerating velocity (2 min per plan for Phase 4)
+- Last 5 plans: 03-02 (3 min), 04-01 (2 min), 04-02 (2 min), 05-01 (9.5 min), 05-02 (3 min)
+- Phase 5 slower due to parallel coordination wait and comprehensive compliance audit
 
 *Updated after each plan completion*
 
@@ -68,6 +69,9 @@ Recent decisions affecting current work:
 - **Bullet gauge shape for metrics** (04-02): Compact horizontal bullet gauges visually distinct from hero semicircle
 - **staticPlot for bullet gauges** (04-02): Prevents mobile touch conflicts on view-only gauges
 - **90-day staleness threshold** (04-02): Amber border indicator for stale metric data
+- **Half-monthly frequency method** (05-01): Divide monthly by 2/4 for fortnightly/weekly (standard AU mortgage calculator approach)
+- **Decimal.js string conversion** (05-01): Always toString() before new Decimal() to prevent IEEE 754 precision loss
+- **Footer disclaimer rewrite** (05-02): ASIC RG 244 compliant with AFS Licence statement, non-endorsement, personal circumstances caveat
 
 ### Pending Todos
 
@@ -75,13 +79,13 @@ None yet.
 
 ### Blockers/Concerns
 
-- **Building Approvals data source** (RESOLVED 01-04): ABS Data API "BA" dataflow not found — resolved by using BA_GCCSA dataflow. Building approvals now implemented with 144 rows of historical data.
+- **Building Approvals data source** (RESOLVED 01-04): ABS Data API "BA" dataflow not found -- resolved by using BA_GCCSA dataflow. Building approvals now implemented with 144 rows of historical data.
 - **Web scraper maintenance burden** (01-02): CoreLogic, NAB, ASX scrapers have TODOs for actual implementation. May need PDF parsing, Selenium/Playwright for JS-rendered pages, or alternative data sources. Optional sources pattern means pipeline continues even if these fail.
 - **Mixed ABS series data** (03-02): Employment and retail trade CSVs contain multiple ABS series mixed together (wildcard queries). Produces invalid YoY% values. Need ABS filter refinement in Phase 1 gap closure.
 
 ## Session Continuity
 
-Last session: 2026-02-06 06:33 UTC
-Stopped at: Completed 04-02-PLAN.md — Individual Metric Bullet Gauges
+Last session: 2026-02-06 06:39 UTC
+Stopped at: Completed 05-02-PLAN.md -- ASIC Compliance Audit
 Resume file: None
-Next: Phase 4 complete. Phase 5 (Calculator & Compliance) is next.
+Next: All phases complete. Remaining work: Phase 1 gap closure (Plan 01-05) for ABS filter refinement.
