@@ -111,3 +111,62 @@ test.describe('Phase 4 — Hawk-O-Meter Gauges', () => {
   });
 
 });
+
+test.describe('Phase 7 — ASX Futures Section', () => {
+
+  test('6. ASX futures section renders with probability table when data available', async ({ page }) => {
+    // Intercept status.json and inject asx_futures data
+    await page.route('**/data/status.json', async route => {
+      const response = await route.fetch();
+      const json = await response.json();
+      // Inject test asx_futures data
+      json.asx_futures = {
+        current_rate: 4.35,
+        implied_rate: 4.10,
+        next_meeting: '2026-02-18',
+        direction: 'cut',
+        data_date: '2026-02-07',
+        staleness_days: 0,
+        probabilities: { cut: 85, hold: 15, hike: 0 }
+      };
+      await route.fulfill({ json });
+    });
+
+    await page.goto('/');
+
+    // The ASX futures container should be visible
+    const asxContainer = page.locator('#asx-futures-container');
+    await expect(asxContainer).toBeVisible({ timeout: 15000 });
+
+    // Should show "What Markets Expect" heading
+    await expect(asxContainer).toContainText('What Markets Expect');
+
+    // Should show the probability table with outcomes
+    await expect(asxContainer).toContainText('Rate Cut');
+    await expect(asxContainer).toContainText('85.0%');
+    await expect(asxContainer).toContainText('Hold');
+    await expect(asxContainer).toContainText('15.0%');
+  });
+
+  test('7. ASX futures section hidden when data unavailable', async ({ page }) => {
+    // Intercept status.json and ensure asx_futures is null
+    await page.route('**/data/status.json', async route => {
+      const response = await route.fetch();
+      const json = await response.json();
+      // Ensure no asx_futures data
+      json.asx_futures = null;
+      await route.fulfill({ json });
+    });
+
+    await page.goto('/');
+
+    // Wait for gauges to render (proves page loaded)
+    const heroPlot = page.locator('#hero-gauge-plot');
+    await expect(heroPlot).toBeVisible({ timeout: 15000 });
+
+    // ASX futures container should be hidden (display: none)
+    const asxContainer = page.locator('#asx-futures-container');
+    await expect(asxContainer).toBeHidden();
+  });
+
+});

@@ -157,7 +157,7 @@ var InterpretationsModule = (function () {
       var probCell = document.createElement('td');
       probCell.className = 'py-2 text-right font-mono';
       probCell.style.color = isHighest ? '#f3f4f6' : '#9ca3af';
-      probCell.textContent = outcome.prob != null ? percentFormatter.format(outcome.prob) : '--';
+      probCell.textContent = outcome.prob != null ? percentFormatter.format(outcome.prob / 100) : '--';
 
       row.appendChild(labelCell);
       row.appendChild(probCell);
