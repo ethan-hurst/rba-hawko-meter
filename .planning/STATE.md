@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** "Data, not opinion." Empowers laypeople to understand interest rate drivers without relying on media sensationalism or biased advice.
-**Current focus:** Phase 6 - UX Plain English (in progress)
+**Current focus:** Phase 6 - UX Plain English (complete)
 
 ## Current Position
 

@@ -16,7 +16,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 2: Core Dashboard** - Static UI with rate display and historical charts
 - [ ] **Phase 3: Data Normalization & Z-Scores** - Statistical engine for metric transformation
 - [ ] **Phase 4: Hawk-O-Meter Gauges** - Traffic-light visualization system
-- [ ] **Phase 5: Calculator & Compliance** - Mortgage calculator and regulatory polish
+- [x] **Phase 5: Calculator & Compliance** - Mortgage calculator and regulatory polish
+- [x] **Phase 6: UX & Plain English Overhaul** - Transform jargon to layman-friendly language
 
 ## Phase Details
 
@@ -105,15 +106,35 @@ Plans:
 - [ ] 05-01-PLAN.md — Mortgage impact calculator: input form, repayment math, scenario slider, localStorage persistence
 - [ ] 05-02-PLAN.md — Compliance audit and polish: disclaimer verification, neutral language enforcement, ASIC compliance review, accessibility audit
 
+### Phase 6: UX & Plain English Overhaul
+**Goal**: Transform dashboard from economist-speak to everyday Australian English so a homeowner understands rate pressure in under 5 seconds
+**Depends on**: Phase 4, Phase 5
+**Requirements**: UX audit findings (3 parallel audits: data clarity, info architecture, plain English copy)
+**Success Criteria** (what must be TRUE):
+  1. All gauge labels use plain English (no "hawkish"/"dovish" without explanation)
+  2. Every data point has a layman explanation of what it means and why it matters
+  3. Building approvals data quality issue is guarded against in the rendering layer
+  4. Missing indicators are acknowledged with placeholder cards or coverage notice
+  5. Score displays "/100" suffix with scale explainer text
+  6. Verdict text answers "what does this mean for my mortgage?" not just "indicators are balanced"
+  7. Stale data warnings explain age in months with context, not just "(stale)"
+**Plans**: 3 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Plain English labels, onboarding section, score explainer (P0 critical fixes)
+- [ ] 06-02-PLAN.md — Interpretation rewrites, data quality guards, weight badges, stale labels (P0/P1)
+- [ ] 06-03-PLAN.md — Information architecture improvements, calculator bridge, mobile UX, meta tags (P1/P2)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Data Pipeline | 3/5 | Gap closure | - |
-| 2. Core Dashboard | 0/2 | Planned | - |
-| 3. Data Normalization & Z-Scores | 0/2 | Planned | - |
-| 4. Hawk-O-Meter Gauges | 0/2 | Planned | - |
-| 5. Calculator & Compliance | 0/2 | Planned | - |
+| 1. Foundation & Data Pipeline | 5/5 | Complete | 2026-02-06 |
+| 2. Core Dashboard | 2/2 | Complete | 2026-02-06 |
+| 3. Data Normalization & Z-Scores | 2/2 | Complete | 2026-02-06 |
+| 4. Hawk-O-Meter Gauges | 2/2 | Complete | 2026-02-06 |
+| 5. Calculator & Compliance | 2/2 | Complete | 2026-02-06 |
+| 6. UX & Plain English Overhaul | 3/3 | Complete | 2026-02-06 |
