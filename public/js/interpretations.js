@@ -333,7 +333,13 @@ var InterpretationsModule = (function () {
 
     var weightBadge = document.createElement('span');
     weightBadge.className = 'text-xs text-gray-500';
-    weightBadge.textContent = Math.round(weight * 100) + '% weight';
+    var pct = Math.round(weight * 100);
+    var importanceLabel;
+    if (pct >= 20) importanceLabel = 'High importance';
+    else if (pct >= 10) importanceLabel = 'Medium importance';
+    else importanceLabel = 'Lower importance';
+    weightBadge.textContent = importanceLabel;
+    weightBadge.title = pct + '% of overall score';
 
     header.appendChild(label);
     header.appendChild(weightBadge);
@@ -360,14 +366,24 @@ var InterpretationsModule = (function () {
     interpDiv.textContent = generateMetricInterpretation(metricId, metricData);
     card.appendChild(interpDiv);
 
-    // Source citation
+    // Why it matters one-liner
+    var whyText = getWhyItMatters(metricId);
+    if (whyText) {
+      var whyDiv = document.createElement('div');
+      whyDiv.className = 'text-xs text-gray-500 mt-1 italic';
+      whyDiv.textContent = whyText;
+      card.appendChild(whyDiv);
+    }
+
+    // Source citation with Australian date format
     var sourceDiv = document.createElement('div');
     sourceDiv.className = 'text-xs text-gray-600 mt-2';
-    sourceDiv.textContent = 'Data as of ' + (metricData.data_date || 'unknown');
+    sourceDiv.textContent = 'Data as of ' + formatAusDate(metricData.data_date);
     if (stale) {
+      var months = Math.round(metricData.staleness_days / 30);
       var staleNote = document.createElement('span');
       staleNote.className = 'text-amber-400 ml-2';
-      staleNote.textContent = '(stale)';
+      staleNote.textContent = '(' + months + ' month' + (months !== 1 ? 's' : '') + ' old \u2014 newer data not yet available)';
       sourceDiv.appendChild(staleNote);
     }
     card.appendChild(sourceDiv);
