@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-04)
 ## Current Position
 
 Phase: 6 of 6 (UX Plain English)
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-02-06 — Completed 06-03-PLAN.md (Information Architecture & Mobile UX)
+Plan: 3 of 3 complete
+Status: Phase complete
+Last activity: 2026-02-06 — Completed 06-02-PLAN.md (Plain English Rewrite)
 
-Progress: [█████████████████████████░] 100% (12/12 plans complete)
+Progress: [██████████████████████████] 100% (13/13 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 3.1 minutes
-- Total execution time: 0.62 hours
+- Total plans completed: 13
+- Average duration: 3.2 minutes
+- Total execution time: 0.69 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [███████████████████████
 | 03 | 2/2 | 6 min | 3.0 min |
 | 04 | 2/2 | 4 min | 2.0 min |
 | 05 | 2/2 | 12.5 min | 6.25 min |
-| 06 | 2/3 | 5 min | 2.5 min |
+| 06 | 3/3 | 8.8 min | 2.9 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (2 min), 05-01 (9.5 min), 05-02 (3 min), 06-01 (2 min), 06-03 (3 min)
-- Phase 6 UX improvements executing efficiently
+- Last 5 plans: 05-01 (9.5 min), 05-02 (3 min), 06-01 (2 min), 06-03 (3 min), 06-02 (3.8 min)
+- Phase 6 complete - all UX improvements shipped
 
 *Updated after each plan completion*
 
@@ -79,6 +79,10 @@ Recent decisions affecting current work:
 - **Exclude asx_futures from placeholder cards** (06-03): It's a benchmark, not a core indicator
 - **HTML5 details/summary for collapsible chart** (06-03): Native browser element for mobile-friendly chart toggle
 - **Calculator bridge uses neutral language** (06-03): "could mean" not "will mean" per ASIC RG 244
+- **Data quality guard for building approvals** (06-02): Filter raw_value < -90 or > 500, show "data being updated" instead of bogus -99.9%
+- **Importance labels over percentages** (06-02): High/Medium/Lower mapped from 20%/10% thresholds for layperson clarity
+- **Australian date format** (06-02): Intl.DateTimeFormat with en-AU locale (1 Dec 2025 not 2025-12-01)
+- **Plain verdict from score ranges** (06-02): Map hawk_score to 5 ASIC-compliant verdict texts using "likely to", "may be more likely" language
 
 ### Pending Todos
 
@@ -92,7 +96,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-06 08:46 UTC
-Stopped at: Completed 06-03-PLAN.md -- Information Architecture & Mobile UX
+Last session: 2026-02-06 08:53 UTC
+Stopped at: Completed 06-02-PLAN.md -- Plain English Rewrite
 Resume file: None
-Next: Continue Phase 6 with Plan 06-02 (Time context & visual hierarchy), or all core UX work complete.
+Next: Phase 6 complete. All planned work complete (13/13 plans). Project ready for deployment.
