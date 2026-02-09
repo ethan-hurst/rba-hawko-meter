@@ -1,12 +1,13 @@
 """
 Pipeline orchestrator with tiered failure handling.
 
-Runs all data ingestors in two phases:
-1. CRITICAL sources (RBA, ABS) - fail fast if any error
-2. OPTIONAL sources (CoreLogic, NAB) - graceful degradation
+Runs all data ingestors in three phases:
+1. CRITICAL sources (RBA Cash Rate, CPI, Employment) - fail fast if any error
+2. IMPORTANT sources (Household Spending, Wage Price Index) - warn but continue
+3. OPTIONAL sources (Building Approvals, CoreLogic, NAB) - graceful degradation
 
 Exit codes:
-- 0: All critical sources succeeded (optional failures are non-fatal)
+- 0: All critical sources succeeded (important/optional failures are non-fatal)
 - 1: Critical source failed (pipeline failed)
 """
 
@@ -29,10 +30,17 @@ except ImportError:
 # Define source tiers
 CRITICAL_SOURCES = [
     ('RBA Cash Rate', rba_data),
-    ('ABS Economic Data', abs_data),
+    ('ABS CPI', lambda: abs_data.fetch_and_save('cpi')),
+    ('ABS Employment', lambda: abs_data.fetch_and_save('employment')),
+]
+
+IMPORTANT_SOURCES = [
+    ('ABS Household Spending', lambda: abs_data.fetch_and_save('household_spending')),
+    ('ABS Wage Price Index', lambda: abs_data.fetch_and_save('wage_price_index')),
 ]
 
 OPTIONAL_SOURCES = [
+    ('ABS Building Approvals', lambda: abs_data.fetch_and_save('building_approvals')),
     ('CoreLogic Housing', corelogic_scraper),
     ('NAB Capacity', nab_scraper),
 ]
@@ -48,6 +56,7 @@ def run_pipeline() -> Dict[str, Any]:
     results = {
         'run_date': datetime.utcnow().isoformat() + 'Z',
         'critical': {},
+        'important': {},
         'optional': {},
         'status': 'pending'
     }
@@ -64,7 +73,11 @@ def run_pipeline() -> Dict[str, Any]:
     for name, module in CRITICAL_SOURCES:
         print(f"\n[CRITICAL] {name}")
         try:
-            result = module.fetch_and_save()
+            # Call lambda functions directly, modules via fetch_and_save method
+            if callable(module) and hasattr(module, '__name__') and '<lambda>' in str(module):
+                result = module()
+            else:
+                result = module.fetch_and_save()
             results['critical'][name] = {
                 'status': 'success',
                 'result': result
@@ -90,8 +103,28 @@ def run_pipeline() -> Dict[str, Any]:
     print("\n" + "-" * 60)
     print("✓ All critical sources succeeded")
 
-    # Phase 2: Optional sources (graceful degradation)
-    print("\n\nPHASE 2: OPTIONAL SOURCES")
+    # Phase 2: Important sources (warn but continue)
+    print("\n\nPHASE 2: IMPORTANT SOURCES")
+    print("-" * 60)
+
+    important_failures = []
+
+    for name, module in IMPORTANT_SOURCES:
+        print(f"\n[IMPORTANT] {name}")
+        try:
+            result = module() if callable(module) else module.fetch_and_save()
+            results['important'][name] = {'status': 'success', 'result': result}
+            print(f"✓ {name} completed successfully")
+        except Exception as e:
+            print(f"⚠ WARNING: {name} failed: {e}")
+            results['important'][name] = {'status': 'failed', 'error': str(e)}
+            important_failures.append(name)
+
+    if important_failures:
+        print(f"\n⚠ {len(important_failures)} important source(s) failed: {', '.join(important_failures)}")
+
+    # Phase 3: Optional sources (graceful degradation)
+    print("\n\nPHASE 3: OPTIONAL SOURCES")
     print("-" * 60)
 
     optional_failures = []
@@ -99,7 +132,7 @@ def run_pipeline() -> Dict[str, Any]:
     for name, module in OPTIONAL_SOURCES:
         print(f"\n[OPTIONAL] {name}")
         try:
-            result = module.fetch_and_save()
+            result = module() if callable(module) else module.fetch_and_save()
 
             # Check if result indicates failure (scrapers return status dicts)
             if isinstance(result, dict) and result.get('status') == 'failed':
@@ -122,16 +155,18 @@ def run_pipeline() -> Dict[str, Any]:
             optional_failures.append(name)
 
     # Determine final status
-    if optional_failures:
+    all_failures = important_failures + optional_failures
+    if all_failures:
         results['status'] = 'partial'
+        results['important_failures'] = important_failures
         results['optional_failures'] = optional_failures
-        print(f"\n⚠ {len(optional_failures)} optional source(s) failed: {', '.join(optional_failures)}")
+        print(f"\n⚠ {len(all_failures)} non-critical source(s) failed: {', '.join(all_failures)}")
     else:
         results['status'] = 'success'
-        print("\n✓ All optional sources succeeded")
+        print("\n✓ All non-critical sources succeeded")
 
-    # Phase 3: Data normalization and status.json generation
-    print("\n\nPHASE 3: DATA NORMALIZATION")
+    # Phase 4: Data normalization and status.json generation
+    print("\n\nPHASE 4: DATA NORMALIZATION")
     print("-" * 60)
 
     if not NORMALIZATION_AVAILABLE:
@@ -164,16 +199,21 @@ def run_pipeline() -> Dict[str, Any]:
     print("PIPELINE SUMMARY")
     print("=" * 60)
 
-    total_sources = len(CRITICAL_SOURCES) + len(OPTIONAL_SOURCES)
+    total_sources = len(CRITICAL_SOURCES) + len(IMPORTANT_SOURCES) + len(OPTIONAL_SOURCES)
     critical_success = sum(1 for r in results['critical'].values() if r.get('status') == 'success')
+    important_success = sum(1 for r in results['important'].values() if r.get('status') == 'success')
     optional_success = sum(1 for r in results['optional'].values() if r.get('status') == 'success')
-    total_success = critical_success + optional_success
+    total_success = critical_success + important_success + optional_success
     total_failures = total_sources - total_success
 
     print(f"Total sources: {total_sources}")
     print(f"Succeeded: {total_success}")
     print(f"Failed: {total_failures}")
-    print(f"Status: {results['status'].upper()}")
+    print(f"\nTier Breakdown:")
+    print(f"  Critical: {critical_success}/{len(CRITICAL_SOURCES)} succeeded")
+    print(f"  Important: {important_success}/{len(IMPORTANT_SOURCES)} succeeded")
+    print(f"  Optional: {optional_success}/{len(OPTIONAL_SOURCES)} succeeded")
+    print(f"\nStatus: {results['status'].upper()}")
     print("=" * 60)
 
     return results

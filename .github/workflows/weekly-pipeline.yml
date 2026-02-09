@@ -31,6 +31,26 @@ jobs:
       - name: Run data pipeline
         run: python -m pipeline.main
 
+      - name: Generate pipeline status summary
+        if: always()
+        run: |
+          echo "## Weekly Pipeline Status" >> $GITHUB_STEP_SUMMARY
+          python3 -c "
+          import json
+          try:
+              with open('public/data/status.json') as f:
+                  status = json.load(f)
+              score = status['overall']['hawk_score']
+              available = status['metadata']['indicators_available']
+              missing = status['metadata']['indicators_missing']
+              print(f'Hawk Score: **{score:.1f}** ({status[\"overall\"][\"zone_label\"]})', file=open('$GITHUB_STEP_SUMMARY', 'a'))
+              print(f'Indicators: {available}/8 available', file=open('$GITHUB_STEP_SUMMARY', 'a'))
+              if missing:
+                  print(f'Missing: {', '.join(missing)}', file=open('$GITHUB_STEP_SUMMARY', 'a'))
+          except Exception as e:
+              print(f'Error reading status.json: {e}', file=open('$GITHUB_STEP_SUMMARY', 'a'))
+          "
+
       - name: Commit updated data
         uses: stefanzweifel/git-auto-commit-action@v7
         with:

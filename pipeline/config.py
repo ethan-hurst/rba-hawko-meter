@@ -13,6 +13,11 @@ DEFAULT_TIMEOUT = 30  # seconds
 USER_AGENT = "RBA-Hawko-Meter/1.0 (Data Pipeline)"
 BROWSER_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 
+# Per-indicator timeout overrides for slow/unreliable sources
+TIMEOUT_OVERRIDES = {
+    'building_approvals': 60,  # Known to be slow/unreliable
+}
+
 # ASX Rate Tracker JSON endpoints (disguised as .csv URLs, return JSON)
 ASX_FUTURES_URLS = {
     "dynamic_text": "https://www.asx.com.au/data/ASX_RateTracker_DynamicText.csv",

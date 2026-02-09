@@ -18,12 +18,20 @@ def create_session(
     Create a requests.Session with retry logic configured.
 
     Args:
-        retries: Maximum number of retry attempts
+        retries: Maximum number of retry attempts (default: 3)
         backoff_factor: Backoff factor for exponential delay (0.5 = 0.5s, 1s, 2s...)
         user_agent: Custom User-Agent string (default: from config)
 
     Returns:
         Configured requests.Session instance
+
+    Note:
+        urllib3 Retry automatically handles:
+        - HTTP 500-504 status codes (server errors)
+        - Connection errors (ConnectionError, ConnectTimeoutError)
+
+        Read timeouts (ChunkedEncodingError) are NOT automatically retried.
+        Callers should wrap requests in try-except and handle these explicitly.
     """
     session = requests.Session()
 

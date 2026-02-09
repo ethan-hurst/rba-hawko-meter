@@ -4,13 +4,14 @@ Fetches economic indicators via ABS Data API (SDMX 2.1).
 """
 
 import sys
+import requests
 import pandas as pd
-from pipeline.config import ABS_API_BASE, ABS_CONFIG, DATA_DIR, DEFAULT_TIMEOUT
+from pipeline.config import ABS_API_BASE, ABS_CONFIG, DATA_DIR, DEFAULT_TIMEOUT, TIMEOUT_OVERRIDES
 from pipeline.utils.csv_handler import append_to_csv
 from pipeline.utils.http_client import create_session
 
 
-def fetch_abs_series(dataflow_id: str, key: str, params: dict = None, filters: dict = None) -> pd.DataFrame:
+def fetch_abs_series(dataflow_id: str, key: str, params: dict = None, filters: dict = None, timeout: int = None) -> pd.DataFrame:
     """
     Fetch a data series from ABS Data API.
 
@@ -19,6 +20,7 @@ def fetch_abs_series(dataflow_id: str, key: str, params: dict = None, filters: d
         key: Series key/filter (use "all" for wildcard)
         params: Optional query parameters (e.g., {"startPeriod": "2014"})
         filters: Optional dimension filters to apply after fetching
+        timeout: Optional timeout override in seconds (default: DEFAULT_TIMEOUT)
 
     Returns:
         DataFrame with columns: date, value, source, series_id
@@ -34,14 +36,27 @@ def fetch_abs_series(dataflow_id: str, key: str, params: dict = None, filters: d
         'Accept': 'application/vnd.sdmx.data+csv;labels=both'
     }
 
+    # Use custom timeout or default
+    request_timeout = timeout or DEFAULT_TIMEOUT
+
     # Make request
-    response = session.get(url, headers=headers, params=params, timeout=DEFAULT_TIMEOUT)
+    response = session.get(url, headers=headers, params=params, timeout=request_timeout)
 
     if response.status_code != 200:
         raise Exception(f"ABS API error: {response.status_code} for {url}\nResponse: {response.text[:500]}")
 
+    # Defensive check: Ensure response body is complete
+    if not response.text:
+        raise Exception(f"Empty response body from ABS API for {dataflow_id}/{key}")
+
+    if len(response.text) < 100:
+        raise Exception(f"Response too short ({len(response.text)} bytes) - likely incomplete")
+
     # Parse CSV response
-    df = pd.read_csv(pd.io.common.StringIO(response.text))
+    try:
+        df = pd.read_csv(pd.io.common.StringIO(response.text))
+    except pd.errors.ParserError as e:
+        raise Exception(f"Failed to parse CSV response: {e}\nPreview: {response.text[:500]}")
 
     if len(df) == 0:
         raise Exception(f"No data returned from ABS API for {dataflow_id}/{key}")
@@ -178,11 +193,13 @@ def fetch_wage_price_index() -> pd.DataFrame:
 def fetch_building_approvals() -> pd.DataFrame:
     """Fetch Building Approvals for total dwellings (Monthly)."""
     config = ABS_CONFIG["building_approvals"]
+    timeout = TIMEOUT_OVERRIDES.get('building_approvals', DEFAULT_TIMEOUT)
     return fetch_abs_series(
         config["dataflow"],
         config["key"],
         config.get("params"),
-        config.get("filters")
+        config.get("filters"),
+        timeout=timeout
     )
 
 
@@ -227,8 +244,17 @@ def fetch_and_save(series: str = None) -> dict:
                 output_path = DATA_DIR / output_file
                 row_count = append_to_csv(output_path, df)
                 results[name] = row_count
+            except requests.exceptions.ChunkedEncodingError as e:
+                print(f"ERROR: Network transfer interrupted for {name}: {e}")
+                results[name] = 0
+            except requests.exceptions.Timeout as e:
+                print(f"ERROR: Request timeout for {name}: {e}")
+                results[name] = 0
+            except requests.exceptions.ConnectionError as e:
+                print(f"ERROR: Connection failed for {name}: {e}")
+                results[name] = 0
             except Exception as e:
-                print(f"ERROR fetching {name}: {e}")
+                print(f"ERROR fetching {name}: {type(e).__name__}: {e}")
                 results[name] = 0
 
     return results
