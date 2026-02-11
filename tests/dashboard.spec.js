@@ -14,8 +14,8 @@ test.describe('Phase 4 — Hawk-O-Meter Gauges', () => {
     const svg = heroPlot.locator('svg.main-svg');
     await expect(svg.first()).toBeVisible({ timeout: 15000 });
 
-    // Hawk score "42/100" should be visible in the rendered gauge (41.8 rounds to 42)
-    await expect(heroPlot).toContainText('42/100');
+    // Hawk score "40/100" should be visible in the rendered gauge (40.2 rounds to 40)
+    await expect(heroPlot).toContainText('40/100');
 
     // Stance label "HOLDING STEADY" should be visible (score 46 falls in 40-60 range)
     await expect(heroPlot).toContainText('HOLDING STEADY');

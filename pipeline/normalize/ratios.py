@@ -28,7 +28,15 @@ def load_indicator_csv(csv_path):
         print(f"  CSV not found: {path}")
         return None
 
-    df = pd.read_csv(path)
+    if path.stat().st_size == 0:
+        print(f"  CSV is empty: {path}")
+        return None
+
+    try:
+        df = pd.read_csv(path)
+    except pd.errors.EmptyDataError:
+        print(f"  CSV has no parseable data: {path}")
+        return None
 
     # Check for required columns
     if 'value' not in df.columns:
@@ -172,7 +180,16 @@ def load_asx_futures_csv(csv_path):
         print(f"  ASX futures CSV not found: {path}")
         return None
 
-    df = pd.read_csv(path)
+    if path.stat().st_size == 0:
+        print("  ASX futures CSV is empty (0 bytes)")
+        return None
+
+    try:
+        df = pd.read_csv(path)
+    except pd.errors.EmptyDataError:
+        print("  ASX futures CSV has no parseable data")
+        return None
+
     if df.empty:
         print("  ASX futures CSV is empty")
         return None
