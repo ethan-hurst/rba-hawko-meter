@@ -18,10 +18,11 @@ TIMEOUT_OVERRIDES = {
     'building_approvals': 60,  # Known to be slow/unreliable
 }
 
-# ASX Rate Tracker JSON endpoints (disguised as .csv URLs, return JSON)
+# ASX 30-Day Interbank Cash Rate Futures — MarkitDigital API
+# The old ASX Rate Tracker endpoints (ASX_RateTracker_*.csv) were retired.
+# This API returns settlement prices; implied rate = 100 - settlement_price.
 ASX_FUTURES_URLS = {
-    "dynamic_text": "https://www.asx.com.au/data/ASX_RateTracker_DynamicText.csv",
-    "market_expectations": "https://www.asx.com.au/data/ASX_RateTracker_MarketExpectation.csv",
+    "ib_futures": "https://asx.api.markitdigital.com/asx-research/1.0/derivatives/interest-rate/IB/futures?days=365&height=1&width=1",
 }
 
 # RBA (Reserve Bank of Australia) configuration

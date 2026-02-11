@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-02-11T04:01:53.580667Z",
+  "generated_at": "2026-02-11T04:17:45.826640Z",
   "pipeline_version": "1.0.0",
   "overall": {
     "hawk_score": 40.2,
@@ -171,8 +171,20 @@
     "indicators_available": 5,
     "indicators_missing": [
       "housing",
-      "business_confidence",
-      "asx_futures"
+      "business_confidence"
     ]
+  },
+  "asx_futures": {
+    "current_rate": 3.85,
+    "next_meeting": "2026-03-03",
+    "implied_rate": 3.86,
+    "probabilities": {
+      "cut": 0.0,
+      "hold": 100.0,
+      "hike": 0.0
+    },
+    "direction": "hold",
+    "data_date": "2026-02-11",
+    "staleness_days": 0
   }
 }

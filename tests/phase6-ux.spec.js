@@ -1,5 +1,31 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const fs = require('fs');
+const path = require('path');
+
+// Read hawk score from status.json so tests aren't coupled to specific pipeline output
+const statusJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'public', 'data', 'status.json'), 'utf8'));
+const hawkScore = Math.round(statusJson.overall.hawk_score);
+
+// Mirror gauges.js ZONE_COLORS logic
+function getExpectedStanceLabel(score) {
+  if (score < 20) return 'RATES LIKELY FALLING';
+  if (score < 40) return 'LEANING TOWARDS CUTS';
+  if (score < 60) return 'HOLDING STEADY';
+  if (score < 80) return 'LEANING TOWARDS RISES';
+  return 'RATES LIKELY RISING';
+}
+const expectedStance = getExpectedStanceLabel(hawkScore);
+
+// Mirror interpretations.js getPlainVerdict logic
+function getExpectedVerdictFragment(score) {
+  if (score < 20) return 'Interest rates are more likely to come down';
+  if (score < 40) return 'Interest rates may be more likely to fall';
+  if (score <= 60) return 'Interest rates are likely to stay';
+  if (score <= 80) return 'Interest rates may be more likely to rise';
+  return 'Interest rates are more likely to go up';
+}
+const expectedVerdict = getExpectedVerdictFragment(hawkScore);
 
 test.describe('Phase 6 — UX & Plain English Overhaul', () => {
 
@@ -12,8 +38,8 @@ test.describe('Phase 6 — UX & Plain English Overhaul', () => {
     const svg = heroPlot.locator('svg.main-svg');
     await expect(svg.first()).toBeVisible({ timeout: 15000 });
 
-    // Score 46 falls in neutral zone (40-60) — should show "HOLDING STEADY"
-    await expect(heroPlot).toContainText('HOLDING STEADY');
+    // Current score falls in a zone — stance label should match
+    await expect(heroPlot).toContainText(expectedStance);
 
     // Verify NO occurrence of old jargon terms anywhere on the page
     const bodyText = await page.locator('body').textContent();
@@ -24,10 +50,10 @@ test.describe('Phase 6 — UX & Plain English Overhaul', () => {
   test('12. All gauges show /100 suffix for clarity', async ({ page }) => {
     await page.goto('/');
 
-    // Hero gauge should display "40/100" (hawk_score 40.2 rounds to 40)
+    // Hero gauge should display "<score>/100" (derived from status.json)
     const heroPlot = page.locator('#hero-gauge-plot');
     await expect(heroPlot).toBeVisible();
-    await expect(heroPlot).toContainText('40/100', { timeout: 15000 });
+    await expect(heroPlot).toContainText(`${hawkScore}/100`, { timeout: 15000 });
 
     // At least one bullet gauge in the grid should contain "/100"
     const grid = page.locator('#metric-gauges-grid');
@@ -86,9 +112,8 @@ test.describe('Phase 6 — UX & Plain English Overhaul', () => {
     const verdictContainer = page.locator('#verdict-container');
     await expect(verdictContainer).toBeVisible({ timeout: 15000 });
 
-    // Score 46 falls in mixed signals range (40-60)
-    // Should contain plain English guidance about interest rates
-    await expect(verdictContainer).toContainText('Interest rates are likely to stay');
+    // Verdict should contain plain English guidance matching the current score zone
+    await expect(verdictContainer).toContainText(expectedVerdict);
 
     // Should NOT contain the old jargon phrase
     const verdictText = await verdictContainer.textContent();
