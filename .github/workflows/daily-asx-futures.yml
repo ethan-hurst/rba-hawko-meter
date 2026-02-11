@@ -38,6 +38,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: 'data: daily ASX futures update [skip ci]'
-          file_pattern: 'data/asx_futures.csv public/data/status.json'
+          file_pattern: 'data/*.csv public/data/status.json'
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
