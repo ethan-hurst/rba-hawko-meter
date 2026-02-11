@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-02-06T10:52:55.600279Z",
+  "generated_at": "2026-02-09T05:50:33.252761Z",
   "pipeline_version": "1.0.0",
   "overall": {
-    "hawk_score": 41.8,
+    "hawk_score": 40.2,
     "zone": "neutral",
     "zone_label": "Balanced",
     "verdict": "Economic indicators are broadly balanced",
@@ -19,7 +19,7 @@
       "weight": 0.25,
       "polarity": 1,
       "data_date": "2025-12-31",
-      "staleness_days": 37,
+      "staleness_days": 40,
       "confidence": "HIGH",
       "interpretation": "Inflation below long-run average",
       "history": [
@@ -47,7 +47,7 @@
       "weight": 0.15,
       "polarity": 1,
       "data_date": "2025-07-01",
-      "staleness_days": 220,
+      "staleness_days": 223,
       "confidence": "HIGH",
       "interpretation": "Wage growth near long-run average",
       "history": [
@@ -75,7 +75,7 @@
       "weight": 0.15,
       "polarity": 1,
       "data_date": "2025-12-31",
-      "staleness_days": 37,
+      "staleness_days": 40,
       "confidence": "HIGH",
       "interpretation": "Labour market looser than historical average",
       "history": [
@@ -94,31 +94,31 @@
       ]
     },
     "spending": {
-      "value": 71.3,
+      "value": 60.4,
       "zone": "warm",
       "zone_label": "Mild hawkish pressure",
-      "z_score": 1.279,
-      "raw_value": 6.28,
+      "z_score": 0.623,
+      "raw_value": 5.03,
       "raw_unit": "% YoY",
       "weight": 0.1,
       "polarity": 1,
       "data_date": "2025-12-31",
-      "staleness_days": 37,
+      "staleness_days": 40,
       "confidence": "HIGH",
       "interpretation": "Consumer spending above trend",
       "history": [
         100.0,
-        85.4,
-        72.2,
-        50.5,
-        45.8,
-        42.2,
-        25.0,
-        53.2,
-        53.3,
-        60.2,
-        61.9,
-        71.3
+        84.9,
+        71.3,
+        49.9,
+        45.4,
+        41.9,
+        24.0,
+        53.0,
+        52.6,
+        59.4,
+        60.0,
+        60.4
       ]
     },
     "building_approvals": {
@@ -131,7 +131,7 @@
       "weight": 0.05,
       "polarity": 1,
       "data_date": "2025-12-31",
-      "staleness_days": 37,
+      "staleness_days": 40,
       "confidence": "HIGH",
       "interpretation": "Building approvals near trend",
       "history": [
