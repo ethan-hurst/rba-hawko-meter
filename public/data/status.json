@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-02-23T03:13:59.955298Z",
+  "generated_at": "2026-02-23T06:45:02.837225Z",
   "pipeline_version": "1.0.0",
   "overall": {
     "hawk_score": 48.9,
@@ -184,7 +184,7 @@
       "hike": 0.0
     },
     "direction": "hold",
-    "data_date": "2026-02-20",
-    "staleness_days": 3
+    "data_date": "2026-02-23",
+    "staleness_days": 0
   }
 }
