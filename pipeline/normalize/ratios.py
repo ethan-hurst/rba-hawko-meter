@@ -43,6 +43,10 @@ def load_indicator_csv(csv_path):
         print(f"  CSV missing 'value' column (non-standard schema): {path}")
         return None
 
+    if df.empty:
+        print(f"  CSV has headers but no data rows: {path}")
+        return None
+
     df['date'] = pd.to_datetime(df['date'])
     df['value'] = pd.to_numeric(df['value'], errors='coerce')
     df = df.sort_values('date').reset_index(drop=True)
