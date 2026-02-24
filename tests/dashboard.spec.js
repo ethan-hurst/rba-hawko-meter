@@ -135,7 +135,7 @@ test.describe('Phase 7 — ASX Futures Section', () => {
     await page.route('**/data/status.json', async route => {
       const response = await route.fetch();
       const json = await response.json();
-      // Inject test asx_futures data
+      // Inject test asx_futures data with multi-meeting contract
       json.asx_futures = {
         current_rate: 4.35,
         implied_rate: 4.10,
@@ -143,7 +143,36 @@ test.describe('Phase 7 — ASX Futures Section', () => {
         direction: 'cut',
         data_date: '2026-02-07',
         staleness_days: 0,
-        probabilities: { cut: 85, hold: 15, hike: 0 }
+        probabilities: { cut: 85, hold: 15, hike: 0 },
+        meetings: [
+          {
+            meeting_date: '2026-03-03',
+            meeting_date_label: '3 Mar 2026',
+            implied_rate: 4.10,
+            change_bp: -25.0,
+            probability_cut: 85,
+            probability_hold: 15,
+            probability_hike: 0
+          },
+          {
+            meeting_date: '2026-04-07',
+            meeting_date_label: '7 Apr 2026',
+            implied_rate: 4.15,
+            change_bp: -20.0,
+            probability_cut: 60,
+            probability_hold: 40,
+            probability_hike: 0
+          },
+          {
+            meeting_date: '2026-05-19',
+            meeting_date_label: '19 May 2026',
+            implied_rate: 4.20,
+            change_bp: -15.0,
+            probability_cut: 40,
+            probability_hold: 60,
+            probability_hike: 0
+          }
+        ]
       };
       await route.fulfill({ json });
     });
@@ -157,14 +186,14 @@ test.describe('Phase 7 — ASX Futures Section', () => {
     // Should show "What Markets Expect" heading
     await expect(asxContainer).toContainText('What Markets Expect');
 
-    // Should show the probability table with outcomes
-    await expect(asxContainer).toContainText('Rate Cut');
-    await expect(asxContainer).toContainText('85.0%');
-    await expect(asxContainer).toContainText('Hold');
-    await expect(asxContainer).toContainText('15.0%');
+    // Should show multi-meeting table rows
+    await expect(asxContainer).toContainText('3 Mar 2026');
+    await expect(asxContainer).toContainText('7 Apr 2026');
+    await expect(asxContainer).toContainText('4.10%');
+    await expect(asxContainer).toContainText('Data as of');
   });
 
-  test('7. ASX futures section hidden when data unavailable', async ({ page }) => {
+  test('7. ASX futures section shows placeholder when data unavailable', async ({ page }) => {
     // Intercept status.json and ensure asx_futures is null
     await page.route('**/data/status.json', async route => {
       const response = await route.fetch();
@@ -180,9 +209,10 @@ test.describe('Phase 7 — ASX Futures Section', () => {
     const heroPlot = page.locator('#hero-gauge-plot');
     await expect(heroPlot).toBeVisible({ timeout: 15000 });
 
-    // ASX futures container should be hidden (display: none)
+    // ASX futures container should be visible (always shown) with placeholder text
     const asxContainer = page.locator('#asx-futures-container');
-    await expect(asxContainer).toBeHidden();
+    await expect(asxContainer).toBeVisible();
+    await expect(asxContainer).toContainText('Market futures data currently unavailable');
   });
 
 });
