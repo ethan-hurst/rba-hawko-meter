@@ -1,153 +1,246 @@
 # Pitfalls Research
 
-**Domain:** Australian Economic Data Scraping — Adding real scrapers for CoreLogic (housing), NAB (capacity utilisation PDF), and ASX IB Futures to an existing GitHub Actions pipeline
+**Domain:** Adding local CI and test infrastructure to an existing Python+JS pipeline project
 **Researched:** 2026-02-24
-**Confidence:** HIGH (CoreLogic legal risk verified via official ToS; ASX endpoint status verified live; NAB page structure verified via direct fetch)
+**Confidence:** HIGH (based on direct codebase analysis, established pytest/ruff/git-hooks patterns)
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: Scraping Cotality (CoreLogic) Violates Their Website Terms of Service
+### Pitfall 1: Testing External APIs Directly in the Unit Test Suite
 
 **What goes wrong:**
-The scraper hits `www.cotality.com` (formerly `www.corelogic.com.au`, which now 301-redirects) to extract housing price figures from news/research releases. The scraper may work technically while constituting a breach of Cotality's website terms.
+Tests for `abs_data.py`, `asx_futures_scraper.py`, `nab_scraper.py`, and `corelogic_scraper.py` call out to real government and market APIs. The pre-push hook runs these tests on every push. After a few weeks, the suite is "slow and flaky" — developers start bypassing the hook with `git push --no-verify`. The hook is dead.
 
 **Why it happens:**
-Cotality's Website Terms of Use (Clause 8.4d) explicitly prohibit:
+The natural instinct when adding tests to an ingestor is to write a test that calls `fetch_and_save()` and checks the return value. This is an integration test disguised as a unit test. External APIs (ABS SDMX, ASX MarkitDigital, NAB, Cotality) have no SLA guarantees for developer test traffic. The ABS API returns HTTP 429 during scraper development load. NAB has Cloudflare bot detection that trips on automated requests from CI IPs.
 
-> "use any manual process (such as keying-in), robot, spider, screen scraper, injection techniques, data aggregation tool or use any other device or automated process (Scraping Process) to data mine, scrape, crawl, email harvest, aggregate, copy or extract any Cotality Services, processes, information, content, or data accessible through this Website"
-
-The prohibition covers "any content or data accessible through this Website" without carve-outs for public news pages. Cotality is currently involved in active Australian litigation against another company for data scraping (BCI Media v CoreLogic), signalling active enforcement posture.
+**Consequences:**
+- Pre-push hook takes 30+ seconds for a change to a CSS file.
+- Tests pass locally, fail in CI because ABS is temporarily down.
+- Developers learn `--no-verify`. The hook provides no protection.
+- Test run marks the whole suite red due to a 503 from a government server.
 
 **How to avoid:**
-Use the ABS as the housing price data source instead of Cotality. Specifically:
-- **ABS Total Value of Dwellings** (catalog 6432.0) is published quarterly and includes mean and median dwelling prices nationally. This dataset is compiled from CoreLogic sales data but is served by the ABS under their open data terms.
-- **ABS House Price Indexes** (catalog 6416.0) — check whether ABS SDMX API dataflow `HPI` is available.
-- Either source can be fetched via `https://data.api.abs.gov.au/data/` with the existing pattern already used in `abs_data.py`.
+Strictly separate unit tests from integration tests at the architecture level:
+- **Unit tests** (`pytest tests/unit/`): Only use fixtures/mocks. Never call `requests.get()`. Use `pytest-mock` or `responses` library to intercept HTTP calls. These are what the pre-push hook runs.
+- **Integration/live tests** (`pytest tests/live/`): Call real APIs. Run manually via `npm run verify`. Marked with `@pytest.mark.live` so `pytest -m "not live"` excludes them automatically.
 
-If the roadmap explicitly targets CoreLogic/Cotality public media releases despite the ToS risk, the plan must include a legal risk acknowledgement and a fallback to ABS data.
+The `pipeline/utils/http_client.py` `create_session()` function is the injection point — unit tests pass a mock session.
 
 **Warning signs:**
-- The domain `www.corelogic.com.au` now 301-redirects to `www.cotality.com` — any hardcoded `corelogic.com.au` URLs will silently follow the redirect, potentially hitting new page structures.
-- HTTP 403 response or Cloudflare challenge page in CI logs.
-- Scraper returns data locally but fails in GitHub Actions (different IP fingerprint triggers bot detection).
+- Any test file in `tests/unit/` that imports `requests` and does not import `responses` or `unittest.mock`.
+- Test runtime for the unit suite exceeds 5 seconds.
+- Intermittent CI failures not caused by code changes.
 
 **Phase to address:**
-CoreLogic scraper phase (PIPE-03). The plan must make a clear decision: ABS housing data as the compliant alternative, or explicit acknowledgement of Cotality ToS risk with justification (e.g., scraping is for non-commercial personal research, relying on fair dealing). Do NOT silently proceed with Cotality scraping.
+Phase 1 (pytest unit tests). Establish the two-tier architecture before writing the first test.
 
 ---
 
-### Pitfall 2: CoreLogic Has Rebranded to Cotality — All Existing URLs Are Wrong
+### Pitfall 2: Testing Against Committed CSVs Instead of Isolated Fixtures
 
 **What goes wrong:**
-The existing `corelogic_scraper.py` targets `https://www.corelogic.com.au/news-research/reports`. That URL now 301-redirects to `https://www.cotality.com/news-research/reports`, which returns a 404. The new Cotality website has a completely different URL structure.
+Tests for normalization (`ratios.py`, `zscore.py`, `engine.py`) read from `data/abs_cpi.csv`, `data/rba_cash_rate.csv`, etc. — the real committed data files. When the pipeline updates these CSVs, tests that previously passed now fail because a new data point changes the latest z-score or gauge value. A test asserting `gauge_value == 42.3` breaks the week after a new CPI release.
 
 **Why it happens:**
-CoreLogic globally rebranded as Cotality in March 2025. The Australian domain changed from `corelogic.com.au` to `cotality.com`. Old paths that existed under CoreLogic do not exist on the Cotality site.
+The normalize/engine functions use `DATA_DIR` from `config.py`, which resolves to `./data/` relative to the working directory. Tests that call these functions without redirecting the data path inherit this implicit dependency on the working repo state.
 
 **Consequences:**
-The scraper would follow the 301 redirect but then get a 404 from Cotality's new URL structure. Since `fetch_and_save()` catches all exceptions and returns `{'status': 'failed'}`, this failure is silent — the pipeline continues, the dashboard stays at "5 of 8 indicators."
+- Tests become "temporally fragile" — they pass when written and fail three months later.
+- To fix, developers start hardcoding the expected value to whatever the latest run produces. Now the tests assert nothing meaningful.
+- Tests can only be run from the repo root in a specific directory, breaking in any CI environment that has a different working directory.
 
 **How to avoid:**
-Before implementing any CoreLogic/Cotality scraper, manually verify the target URL is live and returns the expected content. The current correct domain for research releases is `www.cotality.com` but the `/news-research/reports` path does not exist. The reports section appears to have moved; use `https://www.cotality.com/au/research` or the media release index as the starting point (both require manual verification before coding).
+Create isolated fixture CSVs in `tests/fixtures/` with a fixed, known dataset (e.g., 20 rows of synthetic quarterly data). Patch `pipeline.config.DATA_DIR` in conftest.py to point to the fixtures directory for all unit tests:
+
+```python
+# tests/conftest.py
+import pytest
+from pathlib import Path
+from unittest.mock import patch
+
+FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
+@pytest.fixture(autouse=True)
+def mock_data_dir():
+    with patch("pipeline.config.DATA_DIR", FIXTURES_DIR):
+        with patch("pipeline.normalize.ratios.DATA_DIR", FIXTURES_DIR):
+            with patch("pipeline.normalize.engine.DATA_DIR", FIXTURES_DIR):
+                yield FIXTURES_DIR
+```
+
+The fixture CSVs never change unless intentionally updated. Tests assert against known expected outputs (e.g., "with these 20 CPI values, YoY pct change for row 13 is 3.2%").
 
 **Warning signs:**
-- Response `status_code == 404` on the `www.cotality.com` target URL.
-- Page content < 500 characters (the existing guard catches this but only after following the redirect).
-- Scraper logs show HTTP 200 but empty DataFrame — this means the redirect succeeded but the page structure is completely different.
+- Any test that reads from `Path("data/")` without patching `DATA_DIR`.
+- Tests that pass today but are silently wrong (asserting the computed value equals whatever the current data produces without an independent expected value).
+- Test output changes after a pipeline run even without code changes.
 
 **Phase to address:**
-PIPE-03 implementation. Verify the target URL live before writing any parsing code. Add a specific URL validation step to the plan.
+Phase 1 (pytest unit tests). Fixtures must be established before normalization tests are written.
 
 ---
 
-### Pitfall 3: ASX MarkitDigital Endpoint Returns 404 Intermittently — Not Reliably Down, Not Reliably Up
+### Pitfall 3: Pre-Push Hook That Blocks on Linting an Existing Codebase
 
 **What goes wrong:**
-Phase 7 verification documented that the ASX endpoints returned 404 as of February 2026. However, live verification during this research (2026-02-24) shows the MarkitDigital endpoint `https://asx.api.markitdigital.com/asx-research/1.0/derivatives/interest-rate/IB/futures?days=365&height=1&width=1` is currently responding HTTP 200 with valid JSON containing 17 IB futures contract items.
+Ruff is installed and run for the first time on 3,227 lines of existing Python. It returns 200+ warnings across 19 files. The pre-push hook runs `ruff check pipeline/` and exits non-zero. Every push fails until all 200+ warnings are fixed. Developer spends a day on linting cleanup instead of the actual milestone work. Or worse: `ruff check` is commented out of the hook "temporarily" and never restored.
 
 **Why it happens:**
-The ASX/MarkitDigital backend appears to have intermittent availability — it was down when Phase 7 was implemented (Feb 7, 2026) but is up as of Feb 24, 2026. This makes the endpoint unreliable: it may work during development but fail in production CI, or vice versa.
+Ruff is strict by default. An existing codebase that has never been linted will have real issues (missing type annotations, unused imports, line length violations) mixed with stylistic preferences (`E501` line-too-long is frequently noisy on data pipelines with long URLs and pandas chains). Running `--select ALL` on an existing codebase produces noise that obscures real errors.
 
 **Consequences:**
-If the scraper is tested locally when the endpoint is up, it appears to work. Then in GitHub Actions, it hits a 404. With the existing graceful degradation pattern (`exit code 2`), the dashboard continues showing stale ASX data rather than raising an alert.
+- The linter hook is neutered immediately because the signal-to-noise ratio is too low.
+- OR: 3+ hours of mechanical linting changes create a large diff that makes the actual feature diff hard to review.
+- OR: The existing code's intentional patterns (e.g., `logging.basicConfig()` at module level in scrapers, bare `except` in graceful-degradation paths) get "fixed" in ways that change runtime behavior.
 
 **How to avoid:**
-- The existing `asx_futures_scraper.py` already handles this correctly with `response.raise_for_status()` + graceful degradation.
-- The actual issue for HAWK-04 is: the scraper code is complete and correct — the only work is to verify the endpoint is back up, check the JSON schema matches `data.items[]` expectations, and confirm the pipeline runs end-to-end in CI.
-- Do NOT assume the endpoint status observed at implementation time will persist. Add a staleness check: if `asx_futures.csv` has no data newer than 14 days, log a prominent warning in the GitHub Actions step output.
+A two-step process:
+1. **Baseline pass before writing any tests**: Run `ruff check pipeline/ --output-format=json | jq 'length'` to count violations. Create `pyproject.toml` (or `ruff.toml`) that selects only the rules that matter for correctness (E, F, W categories) and explicitly ignores line-length (`E501`) and stylistic rules (`ANN`, `D`). Fix the baseline violations. Commit this as a separate "chore: ruff baseline cleanup" commit.
+2. **Hook runs this specific ruff config**: The hook only fails on the agreed-upon ruleset, not the full `--select ALL` ruleset.
+
+Critical: The existing `except Exception: pass` patterns in scraper code (e.g., `csv_handler.py`, `nab_scraper.py`) are intentional. Ruff `BLE001` (blind exception) should be in the ignore list — do not refactor graceful-degradation patterns based on linter suggestions without understanding why they exist.
 
 **Warning signs:**
-- `HTTP 404` or `HTTP 403` in the GitHub Actions step log for the ASX scraper.
-- `asx_futures.csv` file exists but last row `date` is more than 14 days old.
-- Dashboard shows "What Markets Expect" section hidden despite recent runs (frontend hides section when `asx_futures` key absent from `status.json`).
+- First `ruff check` run exits with code 1 and 50+ violations.
+- Any ruff rule in the `ANN` (type annotations) or `D` (docstrings) category is enabled for a codebase that has no type annotations or docstrings.
+- The ruff config enables `--fix` in the hook — this auto-modifies files on push, which surprises developers.
 
 **Phase to address:**
-HAWK-04. The implementation is done. The phase should focus on: (1) confirming the endpoint is live at implementation time via a manual curl, (2) running the existing scraper end-to-end in CI, (3) setting up staleness monitoring.
+Phase 3 (linting). Run the baseline audit before enabling the hook.
 
 ---
 
-### Pitfall 4: NAB Survey Capacity Utilisation Is in the HTML — PDF Parsing Is Unnecessary Complexity
+### Pitfall 4: The Pre-Push Hook Corrupts the Git Staging Area
 
 **What goes wrong:**
-The placeholder `nab_scraper.py` assumes the capacity utilisation figure is only in the PDF and notes "NAB data is in PDF format - scraper needs PDF parsing capability." This assumption is incorrect and would lead to adding unnecessary PDF parsing dependencies (pdfplumber, pypdf) when a simpler solution exists.
+The pre-push hook runs `python -m pytest tests/unit/` and then runs `ruff check`. Both commands succeed. But during the test run, `conftest.py` inadvertently wrote a file to `data/` (because `DATA_DIR` was not properly patched). Git now shows a modified `data/abs_cpi.csv`. The developer's `git push` succeeds but they've just committed unexpected test artifacts to the repo.
+
+Variant: the hook runs `ruff --fix` automatically, modifying staged files. The push goes through but the committed code is different from what the developer reviewed before pushing.
 
 **Why it happens:**
-The placeholder scraper looks for PDF links on the page and concludes data is PDF-only. But the NAB monthly survey pages (e.g., `https://business.nab.com.au/nab-monthly-business-survey-august-2025`) include the capacity utilisation figure directly in the HTML article body: "Capacity utilisation rose to 83.1%". BeautifulSoup can extract this without any PDF library.
+- Tests that use real `DATA_DIR` without isolation will write to committed data files as side effects.
+- `ruff --fix` in hooks is tempting but dangerous: it modifies files, and the developer hasn't reviewed the fixes.
+- Hook scripts that `cd` to different directories can leave the shell in an unexpected state if they exit early.
 
 **Consequences:**
-Adds pdfplumber/pypdf to `requirements.txt` unnecessarily, increasing dependency surface and potential CI failures (pdfplumber has C dependencies via pdfminer.six). PDF layout parsing is brittle — NAB may change which page of the PDF the figure appears on.
+- Committed test artifacts pollute the data history.
+- Developers lose trust in the hook — it "does things" they didn't intend.
+- In the worst case, a test run calls `append_to_csv()` with fixture data and appends garbage rows to a committed CSV.
 
 **How to avoid:**
-Parse the HTML page body using BeautifulSoup and a regex pattern: `r'[Cc]apacity utilisation (?:rose|fell|remained|was) (?:to |at )?(\d+\.?\d*)%'`. This pattern matches the phrasing NAB has used consistently across 2024-2025 survey releases. Only fall back to PDF parsing if the HTML pattern fails two consecutive months.
+- Unit tests must NEVER write to `data/`. The `DATA_DIR` patch in conftest.py must redirect all writes to a `tmp_path` (pytest's temporary directory fixture) or `tests/fixtures/`.
+- The hook must NEVER use `ruff --fix`. Check only, never auto-fix.
+- The hook should `stash --include-untracked` before running if it needs to be safe, but more practically: ensure tests have no side effects by design, not by stashing.
+- Verify with `git status` after the first hook run that no files are modified.
 
 **Warning signs:**
-- The regex returns no match on the HTML page — this may mean NAB changed their phrasing (e.g., "capacity utilisation: 83.1%").
-- `len(soup.get_text(strip=True)) < 500` — page might be JavaScript-rendered (unlikely; NAB pages render server-side).
-- The PDF download link exists but the HTML text does not contain the figure (unlikely but possible if NAB moves to summary-only HTML).
+- `data/*.csv` files appear in `git status` after running `pytest`.
+- `public/data/status.json` is modified after running tests (normalization engine wrote to it during test).
+- Any test that calls `generate_status()` without patching `STATUS_OUTPUT`.
 
 **Phase to address:**
-PIPE-04 implementation. Default to HTML extraction. Only introduce PDF parsing if HTML approach fails during manual verification before implementation.
+Phase 1 (pytest setup) and Phase 4 (pre-push hook). The DATA_DIR isolation must be verified before the hook is enabled.
 
 ---
 
-### Pitfall 5: NAB Survey URL Slug Cannot Be Reliably Constructed Without Discovery
+### Pitfall 5: status.json Validation Tests That Break on Every Pipeline Run
 
 **What goes wrong:**
-The implementation constructs the NAB URL as `https://business.nab.com.au/nab-monthly-business-survey-{month_name}-{year}` expecting a consistent slug pattern. In practice, some releases are on `business.nab.com.au`, others migrate to `news.nab.com.au`, and PDF links are hosted across multiple different path structures.
+A test validates `public/data/status.json` and asserts specific field values: `assert status['overall']['hawk_score'] == 34.2`. The pipeline runs Monday morning. The hawk score is now `31.1`. The test fails. This is treated as a pipeline failure when the pipeline actually succeeded.
 
 **Why it happens:**
-NAB publishes across two domains:
-- `business.nab.com.au` — primary research hub (most monthly surveys 2023-2025)
-- `news.nab.com.au` — press release/news hub (some monthly surveys appear here too)
-
-PDF links are hosted on:
-- `business.nab.com.au/wp-content/uploads/{year}/{month}/NAB-Monthly-Business-Survey-{Month}-{Year}.pdf`
-- `news.nab.com.au/content/dam/nab-news/documents/nab-monthly-business-survey-{mon}-{year}.pdf`
-- `business.nab.com.au/content/dam/nab-business/document/NAB-Monthly-Business-Survey-{Month}-{Year}-.pdf` (note trailing dash before .pdf)
-
-The trailing dash in the PDF filename (confirmed from April 2025: `NAB-Monthly-Business-Survey-April-2025-.pdf`) is inconsistent and cannot be assumed across months.
+`status.json` is a live data file whose contents change every time the pipeline runs. It is also committed to the repo. Tests that assert on its exact values are testing the wrong thing: they're testing the current economic data, not the software that generates the file.
 
 **Consequences:**
-A hardcoded URL construction will fail silently in CI when NAB publishes a month using a different slug or domain. The `fetch_and_save()` graceful degradation means the failure goes unnoticed and the dashboard shows stale capacity utilisation data.
+- Developers manually update the assertion after every pipeline run. After two months, nobody updates it. The test is permanently disabled.
+- CI fails on Monday after every weekly run, creating a false alarm pattern.
 
 **How to avoid:**
-Use a discovery approach rather than URL construction:
-1. Fetch the NAB business survey tag page `https://business.nab.com.au/tag/economic-commentary/` or `https://business.nab.com.au/tag/business-survey/`.
-2. Find the most recent survey link by looking for `<a>` elements matching the pattern `/nab-monthly-business-survey-` sorted by recency.
-3. Fetch that URL and extract the capacity utilisation figure from the HTML body.
-4. If not found on `business.nab.com.au`, try `news.nab.com.au`.
+`status.json` validation tests must validate **schema and constraints**, not values:
+- All required top-level keys exist (`generated_at`, `overall`, `gauges`, `metadata`).
+- `overall.hawk_score` is a float in `[0, 100]`.
+- `overall.zone` is one of `['cold', 'cool', 'neutral', 'warm', 'hot']`.
+- Each gauge entry has `value`, `zone`, `z_score`, `raw_value`, `data_date`, `confidence`, `staleness_days`.
+- `staleness_days` for critical indicators (inflation, employment) is `< 90`.
+- No gauge `value` is `null` or `NaN`.
+- `generated_at` is a valid ISO 8601 timestamp.
 
-This avoids the slug construction problem entirely.
+These constraints hold regardless of what the data is. They would catch: a missing indicator, a NaN z-score propagating through to the gauge, a timestamp field set to an empty string, a gauge value outside [0, 100].
 
 **Warning signs:**
-- `requests.get(constructed_url)` returns 404.
-- The scraped date matches a prior month (stale data silently accepted).
-- Two or more consecutive weeks with no update to `nab_capacity.csv`.
+- Any assertion of the form `assert status['overall']['hawk_score'] == <specific_float>`.
+- Tests that regenerate `status.json` using real CSVs and then validate the output value.
+- Test file that was last updated before a pipeline run.
 
 **Phase to address:**
-PIPE-04 implementation. Use discovery pattern from the start, not URL construction.
+Phase 2 (status.json validation).
+
+---
+
+### Pitfall 6: Over-Engineering the Test Infrastructure
+
+**What goes wrong:**
+The v2.0 milestone gets captured by building a test framework. By the end of the milestone, there are: a conftest with 15 fixtures, a custom pytest plugin for API mocking, a Makefile with 8 targets, a `scripts/run-tests.sh` with 4 environment modes, a `pyproject.toml` with 40 ruff rules and 8 ignore lists, and a coverage report uploaded to a coverage badge service. Zero of the 6 actual pipeline modules have meaningful test coverage. The developer wrote more test infrastructure code than production code.
+
+**Why it happens:**
+Testing is an engineering domain. Engineers apply engineering instincts: abstractions, reusability, configurability. The first test reveals the need for a fixture. The fixture reveals the need for a factory. The factory reveals the need for a base class. This pattern compounds quickly when starting from zero.
+
+**Consequences:**
+- The milestone is consumed by framework work that doesn't test the actual pipeline.
+- Subsequent phases inherit a test framework with assumptions that don't fit their needs.
+- The "framework" becomes a maintenance burden that developers work around rather than with.
+
+**How to avoid:**
+Apply the "simplest thing that works" constraint aggressively:
+- `conftest.py` starts with 3 fixtures: `mock_data_dir`, `sample_cpi_df`, `sample_config`.
+- No custom pytest plugins in this milestone.
+- `npm run test:fast` calls `pytest tests/unit/ -q`. That's the entire fast-test infrastructure.
+- `npm run verify` calls `pytest tests/live/ -v -m live`. That's the entire live infrastructure.
+- No coverage targets until coverage is a stated milestone goal.
+
+The test count goal should be: all pure functions in `zscore.py`, `ratios.py`, `gauge.py`, `csv_handler.py` are tested. That is ~8-12 test functions. Not 50.
+
+**Warning signs:**
+- The conftest.py is longer than the module being tested.
+- A test fixture abstracts over another test fixture.
+- The PR for "Phase 1: unit tests" adds more lines to test infrastructure files than to actual test files.
+- Any reference to `pytest-xdist`, `hypothesis`, or coverage badges in the v2.0 milestone scope.
+
+**Phase to address:**
+Phase 1 (pytest setup). Establish scope constraints in the plan before writing any code.
+
+---
+
+### Pitfall 7: Linting JS and Python in the Same Hook Without Isolation
+
+**What goes wrong:**
+The pre-push hook script calls `ruff check pipeline/` then `npx eslint public/js/`. `npx eslint` takes 8-12 seconds on first run (downloading ESLint on demand). The Python lint step passes in 0.3 seconds; the whole hook takes 15 seconds due to JS linting. Developers pushing a 2-line Python change wait 15 seconds for JS lint they didn't change.
+
+Variant: ESLint is not installed (no `node_modules/`) because the developer only works on Python. The hook crashes with `npx: command not found` or `Cannot find module eslint`. The hook fails on a machine that only has Python set up.
+
+**Why it happens:**
+The hook is written as a single sequential script that always runs both linters. There is no check for whether the linter is available or whether relevant files have changed.
+
+**Consequences:**
+- Slow hook frustrates Python-only changes.
+- Missing ESLint installation breaks the hook entirely on Python-focused machines.
+- Developers disable the hook because it's unreliable.
+
+**How to avoid:**
+- The hook should check if a linter is available before running it: `if command -v npx &>/dev/null && [ -d node_modules ]; then npx eslint public/js/ --quiet; fi`.
+- ESLint in the pre-push hook is optional for v2.0. The primary gate is Python linting and the Python test suite. JS linting can be a `npm run lint` command that developers run manually.
+- If both linters are included, scope them to changed files only: `git diff --name-only HEAD | grep '\.py$'` to decide whether to run ruff.
+
+**Warning signs:**
+- The hook takes > 5 seconds on a warm machine.
+- Hook fails on machines without Node.js installed.
+- Hook runs ESLint even when only Python files changed.
+
+**Phase to address:**
+Phase 4 (pre-push hook). Define the hook's minimum viable scope: Python only. Add JS linting as optional.
 
 ---
 
@@ -155,11 +248,13 @@ PIPE-04 implementation. Use discovery pattern from the start, not URL constructi
 
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
-| Hardcode the NAB URL slug pattern | Simpler code to write | Fails silently when NAB changes slug; stale data undetected for weeks | Never — discovery approach adds ~10 lines of code |
-| Target `corelogic.com.au` URLs | Tests may pass locally (301 redirects) | Domain now 301s to Cotality, which has different URL structure; ToS breach risk | Never — update to `cotality.com` or switch to ABS |
-| Add pdfplumber for NAB PDF parsing | Seems to match the problem | Adds C dependencies, CI failures, brittle page-number assumptions | Only if HTML approach fails after 2+ months |
-| Assume ASX endpoint is reliably up or down | Simpler retry logic | Intermittent availability means build may pass locally and fail in CI, or vice versa | Never — add staleness monitoring regardless |
-| Skip staleness monitoring for optional sources | Faster to ship | Silent data rot: dashboard claims "8 of 8 indicators" but shows 3-month-old NAB data | Never — staleness metadata already expected by the status.json schema |
+| Call real ABS API in unit tests | Tests "feel more real" | Flaky tests, slow suite, pre-push hook bypassed with `--no-verify` | Never — mock HTTP at the session level |
+| Read from `data/*.csv` in unit tests without patching DATA_DIR | No fixture setup required | Tests break on every pipeline run; tests can corrupt committed data | Never — patch DATA_DIR in conftest.py |
+| Assert specific float values from status.json | Easy to write | Breaks every Monday after pipeline run; test becomes meaningless boilerplate | Never — assert schema and range constraints only |
+| Run `ruff --select ALL` on existing code | Maximally strict | 200+ violations, noise drowns signal, hook immediately bypassed | Never — baseline with E/F/W only, add rules incrementally |
+| `ruff --fix` in the pre-push hook | Auto-fixes style | Modifies files the developer hasn't reviewed; corrupts staging area | Never — lint with check-only in hooks |
+| Single `npm test` that runs Playwright + pytest + lint | One command simplicity | Playwright tests require a running server; confusing to run in isolation | Never — keep `npm run test:fast` (Python only) and `npm test` (Playwright) separate |
+| Add pyfakefs or full filesystem mocking | Truly isolates filesystem | Significant setup complexity; harder to debug fixture issues | Only if `DATA_DIR` patching proves insufficient |
 
 ---
 
@@ -167,13 +262,13 @@ PIPE-04 implementation. Use discovery pattern from the start, not URL constructi
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| Cotality (CoreLogic) | Scraping `corelogic.com.au` URLs that now 301-redirect to a broken Cotality path | Verify `cotality.com` URL structure before writing any parser; prefer ABS housing data instead |
-| Cotality (CoreLogic) | Treating public news releases as freely scrapeable | Read ToS Clause 8.4d — automated scraping of website content is prohibited regardless of whether content is paywalled |
-| NAB Business Survey | Constructing URL as `/nab-monthly-business-survey-{month}-{year}` | Discover the latest URL from the tag archive page; NAB uses two domains and inconsistent PDF paths |
-| NAB Business Survey | Adding PDF parsing libraries before testing HTML extraction | Check HTML first — capacity utilisation figure is in the article body text, parseable with regex |
-| ASX MarkitDigital | Concluding the endpoint is permanently down | Endpoint is intermittently available; test live before assuming it needs an alternative |
-| ASX MarkitDigital | Not checking the response JSON schema | The API returns `data.items[]` with `dateExpiry` and `pricePreviousSettlement` fields — validate these keys exist before parsing |
-| GitHub Actions (daily + weekly) | Two workflows writing to `data/*.csv` and `public/data/status.json` without concurrency controls | Already fixed in v1.0: both workflows share `concurrency: group: data-pipeline, cancel-in-progress: false` |
+| pytest + existing Python pipeline | Tests run from wrong directory; relative paths in `config.py` (`DATA_DIR = Path("data")`) resolve to unexpected locations | Run pytest from repo root; verify `DATA_DIR` resolves correctly before writing first test; patch in conftest.py |
+| pytest + Playwright | Running `npm test` (Playwright) after adding pytest; test commands overlap; `npm test` runs only Playwright | Keep commands separate: `npm test` stays Playwright, `npm run test:fast` runs pytest |
+| ruff + existing code with intentional `bare except` | Ruff `BLE001` flags `except Exception: pass` in graceful-degradation scrapers | Add `# noqa: BLE001` inline or add BLE001 to ignore list in `ruff.toml`; do NOT refactor the error handling |
+| ESLint + no `.eslintrc` | ESLint uses default flat config, applies wrong rules to Plotly/Tailwind browser JS | Configure `eslintrc` or `eslint.config.js` with `env: { browser: true }` before first run |
+| pre-push hook + `git stash` | Hook stashes changes, runs tests, fails to unstash on error — developer loses changes | Do NOT stash in hooks; instead ensure tests have no side effects by design |
+| pre-push hook + Python venv | Hook uses system Python, not venv Python; pytest not found; imports fail | Hook must activate venv or use explicit path: `.venv/bin/pytest` or `python -m pytest` |
+| responses library + session retries | `responses` intercepts the `requests` library but the retry adapter in `create_session()` may interfere with mock interception | Use `responses` with `assert_all_requests_are_fired=False`; verify mock is hit by checking call count |
 
 ---
 
@@ -181,9 +276,10 @@ PIPE-04 implementation. Use discovery pattern from the start, not URL constructi
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| Fetching NAB PDF when HTML suffices | 3-5 second download per run; PDF parsing CPU usage; CI timeout risk | Use HTML extraction as primary approach | Immediately, on every CI run |
-| No timeout on requests to optional sources | CI job hangs if Cotality/NAB server is slow | `DEFAULT_TIMEOUT = 30` already set in config.py; verify all `session.get()` calls use it | On first encounter with a slow or unresponsive server |
-| Re-fetching full NAB/Cotality pages to check staleness | Unnecessary HTTP requests even when data is fresh | Check CSV `date` column first; only fetch if last row is > 28 days old | Not a performance issue at current scale, but avoids unnecessary scraping exposure |
+| pytest importing all pipeline modules at collection time triggers network calls | `pytest tests/unit/` hangs for 5 seconds before any test runs | Ensure module-level code in ingestors does not make network calls; `logging.basicConfig()` at module level in scrapers is fine; `session.get()` at module level is not | First run of pytest on this codebase |
+| Live tests mixed with unit tests without markers | `pytest tests/` runs live tests on every invocation including pre-push hook | Use `@pytest.mark.live` and configure `addopts = -m "not live"` in `pyproject.toml` | When a developer runs `pytest` without `-m` flag |
+| pdfplumber import in `nab_scraper.py` and `corelogic_scraper.py` at test time | Tests that import scrapers trigger pdfplumber C extension loading | pdfplumber is imported lazily (`import pdfplumber` inside functions) — this is already the case in the codebase; do not move the import to module level | Immediately if pdfplumber is imported at module level |
+| Generating `status.json` in a test to validate it | Test takes 3-8 seconds to run the full normalization engine | Test schema validation against a pre-generated fixture `status.json`, not against a freshly-generated one | Immediately — normalization engine should not run in unit tests |
 
 ---
 
@@ -191,31 +287,23 @@ PIPE-04 implementation. Use discovery pattern from the start, not URL constructi
 
 | Mistake | Risk | Prevention |
 |---------|------|------------|
-| Hardcoding a browser User-Agent that identifies the project | Gets the specific User-Agent blocked site-wide on Cotality/NAB | Use a generic current Chrome UA; rotate UA strings if blocked |
-| Committing ASX/NAB response data to the repo with sensitive fields | Unlikely for public macro data, but API responses may include internal metadata | Only commit the derived CSV (`asx_futures.csv`, `nab_capacity.csv`) not raw API responses |
-| Using PAT instead of GITHUB_TOKEN for auto-commit | PAT tokens trigger workflow re-runs, creating infinite commit loops | Already using GITHUB_TOKEN via `stefanzweifel/git-auto-commit-action@v7`; do not change |
-
----
-
-## UX Pitfalls
-
-| Pitfall | User Impact | Better Approach |
-|---------|-------------|-----------------|
-| Dashboard shows "8 of 8 indicators" when ASX futures data is 30+ days stale | User believes market expectations are current when they reflect stale futures pricing | Show `data_date` on the "What Markets Expect" section and warn if > 14 days old |
-| Capacity utilisation value from NAB labelled only as "NAB Survey" | User has no idea if this is current or 3 months old | Surface the survey month/year alongside the indicator value |
-| Housing indicator sourced from ABS TVD (quarterly) but displayed alongside monthly indicators | User perceives all indicators as equally current | Add a "(Quarterly)" label to the housing gauge; the status.json `frequency` field already supports this |
+| Live test hits ABS/RBA APIs from a developer machine with a project-identifiable User-Agent | API provider rate-limits or blocks the User-Agent string | Live tests use the same session as production; this is acceptable since live tests run infrequently. Do not add a test-specific User-Agent that would confuse production logs |
+| Git hook script committed with wrong permissions | Hook never runs because it's not executable | `chmod +x .git/hooks/pre-push` in the hook installation step; document this in the setup guide |
+| Hook script added to `.git/hooks/` (not version-controlled) | New team member clones the repo and has no hook | Commit the hook to a version-controlled location (e.g., `scripts/pre-push`) and document: `cp scripts/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push`; or use a hook manager like `pre-commit` |
+| `npm run verify` accidentally runs in GitHub Actions | Full live API call from CI triggers rate-limiting on ABS/RBA | Ensure `verify` script is not called by any GitHub Actions workflow; tag it clearly as "local only" in package.json comments |
 
 ---
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **CoreLogic/Cotality scraper:** Check ToS decision is documented in plan — either "using ABS alternative" or "accepted ToS risk with justification." A scraper that runs successfully is NOT done if it violates Cotality's terms.
-- [ ] **CoreLogic/Cotality URL:** Verify the target URL returns 200 with expected content — `corelogic.com.au` redirects are gone; `cotality.com` paths have changed.
-- [ ] **NAB capacity utilisation:** Verify the regex matches the HTML text on the CURRENT month's page before committing the implementation. Run scraper locally and confirm the extracted value matches the published figure.
-- [ ] **NAB discovery approach:** Confirm the tag archive page (`/tag/business-survey` or `/tag/economic-commentary`) returns the most recent survey link at the top of the listing.
-- [ ] **ASX endpoint:** Run `curl https://asx.api.markitdigital.com/asx-research/1.0/derivatives/interest-rate/IB/futures?days=365&height=1&width=1` before implementing. Confirm HTTP 200 and `data.items` array is present. Endpoint was 404 on 2026-02-07 but was 200 on 2026-02-24 — status is volatile.
-- [ ] **ASX pipeline end-to-end:** The scraper code is already implemented. After confirming endpoint is live, the only remaining work is to verify CI runs succeed and `asx_futures.csv` is populated in the repo.
-- [ ] **Status.json "8 of 8":** After all three scrapers succeed, verify the dashboard text changes from "Based on 5 of 8 indicators" to "Based on 8 of 8 indicators." This requires that all three optional INDICATOR_CONFIG stubs (`housing`, `business_confidence`, `asx_futures`) have `csv_file` set and the CSV files contain data.
+- [ ] **Unit test suite:** Tests pass with `DATA_DIR` pointing to `tests/fixtures/`, not `data/`. Run `git status` after `pytest tests/unit/` — zero files should be modified.
+- [ ] **HTTP mocking:** Every test for an ingestor that would otherwise call a real URL has the HTTP call mocked. Verify by disconnecting from the network and running `pytest tests/unit/` — every test still passes.
+- [ ] **status.json validation:** The validator is tested against a deliberately broken `status.json` (missing a required field, NaN gauge value, staleness > threshold) — the validator must catch each broken case.
+- [ ] **ruff baseline:** Run `ruff check pipeline/ --statistics` before and after the baseline cleanup commit. No rules that would catch real bugs (F401 unused import, F821 undefined name, E711 comparison to None) should be in the ignore list.
+- [ ] **Pre-push hook:** Push a commit that introduces a ruff violation (e.g., `import os` unused) — the hook must reject it. Push a passing commit — it goes through. Push without a venv activated — verify the error message is clear (not a Python traceback).
+- [ ] **Two-tier separation:** Run `npm run test:fast` (must complete in < 10 seconds). Run `npm run verify` (may take 30-120 seconds, calls real APIs). The outputs are clearly distinct.
+- [ ] **ESLint (JS linting):** Run `npx eslint public/js/` without errors on the existing codebase before enabling in any hook. Verify `env: { browser: true }` is set (Plotly, Decimal are browser globals, not Node.js globals).
+- [ ] **Playwright isolation:** `npm test` (Playwright) still passes after adding pytest. The two test suites do not interfere with each other.
 
 ---
 
@@ -223,11 +311,12 @@ PIPE-04 implementation. Use discovery pattern from the start, not URL constructi
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| CoreLogic ToS violation discovered after scraper is live | MEDIUM | Swap to ABS Total Value of Dwellings data source; delete `corelogic_housing.csv` and rebuild with ABS data; update `INDICATOR_CONFIG["housing"]` csv_file pointer |
-| Cotality URL structure changes and scraper breaks | LOW | The scraper already returns `{'status': 'failed'}` gracefully; update target URL in `config.py`; dashboard continues on stale data |
-| NAB slug pattern breaks (new month uses different domain) | LOW | Add fallback to `news.nab.com.au` domain in scraper; discovery approach means only the tag archive URL needs updating |
-| ASX endpoint goes 404 again | LOW | Scraper already handles this gracefully; no user-facing impact beyond hiding "What Markets Expect" section |
-| PDF parsing added unnecessarily and breaks CI | MEDIUM | Remove pdfplumber/pypdf from requirements.txt; revert to HTML extraction approach |
+| Hook bypassed with `--no-verify` due to slow/flaky tests | MEDIUM | Audit which tests are hitting real APIs; move them to `tests/live/`; add HTTP mocks for unit equivalents; re-enable hook |
+| Committed data files modified by test run | LOW | `git restore data/*.csv public/data/status.json`; add DATA_DIR patch to conftest.py; re-run tests to confirm no side effects |
+| Ruff baseline too strict — developers disable the hook | LOW | Loosen the ruleset to E/F/W categories; re-run baseline; get buy-in before re-enabling; document the agreed ruleset |
+| status.json validation tests fail every Monday | LOW | Replace value assertions with range/schema assertions; delete the specific float assertions |
+| Pre-push hook not installed on a new machine | LOW | Document the one-time setup: `cp scripts/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push` |
+| ESLint fails on Plotly browser globals | LOW | Add `/* global Plotly, Decimal */` to JS files or add `env: { browser: true }` to ESLint config; do not add `eslint-disable` lines to the source code |
 
 ---
 
@@ -235,28 +324,31 @@ PIPE-04 implementation. Use discovery pattern from the start, not URL constructi
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Cotality ToS violation | PIPE-03 planning step (before implementation) | Plan explicitly states "using ABS alternative" or documents ToS risk decision |
-| Cotality URL breakage (301 redirect to broken path) | PIPE-03 implementation | Manual `curl cotality.com/{target_path}` returns 200 with expected content |
-| NAB PDF over-engineering | PIPE-04 planning step | Plan specifies HTML extraction as primary; PDF only as fallback |
-| NAB URL slug non-discovery | PIPE-04 implementation | Scraper uses tag archive discovery, not hardcoded slug construction |
-| ASX endpoint intermittent availability | HAWK-04 implementation | CI run produces populated `asx_futures.csv` with rows dated within 7 days |
-| Silent stale data after source failure | All three phases | Status.json includes `data_date` for each optional indicator; dashboard shows staleness warning |
+| External API calls in unit tests | Phase 1: pytest setup | Run `pytest tests/unit/` with network disconnected — all pass |
+| Tests reading from `data/*.csv` | Phase 1: pytest setup | `git status` after `pytest tests/unit/` shows no modified files |
+| status.json tests asserting specific values | Phase 2: status.json validation | Validator passes on `status.json` generated 3 months from now without modification |
+| Ruff noise on existing codebase | Phase 3: linting | `ruff check pipeline/` exits 0 on existing code before new code is written |
+| `ruff --fix` corrupting hook staging | Phase 4: pre-push hook | Hook uses `--check` flag only; verified with `ruff check --help` |
+| Slow/broken hook due to JS linting | Phase 4: pre-push hook | Hook completes in < 5 seconds on a Python-only change |
+| Over-engineering test infrastructure | Phase 1: pytest setup | conftest.py < 50 lines; test count for this phase is 8-15 functions |
+| DATA_DIR patch not covering all module paths | Phase 1: pytest setup | Grep `pipeline/` for `DATA_DIR` usages; verify each is patched in conftest.py |
+| Live tests mixed with unit tests | Phase 1 + Phase 5: live verification | `pytest -m "not live"` runs in < 10 seconds; `pytest -m live` calls real APIs |
+| Hook not version-controlled | Phase 4: pre-push hook | Hook script committed to `scripts/pre-push`; README updated with setup step |
 
 ---
 
 ## Sources
 
-- **Cotality Website Terms of Use** (Clause 8.4d): https://www.cotality.com/legals/website-terms — prohibits "any automated process (Scraping Process) to data mine, scrape, crawl... any Cotality Services, processes, information, content, or data accessible through this Website" (HIGH confidence — official legal document, fetched directly)
-- **Cotality Product Terms and Conditions** (Clause A3.1g): https://www.cotality.com/au/legal/terms-conditions — extends prohibition to paid service customers (HIGH confidence — official legal document)
-- **CoreLogic rebrand to Cotality (March 2025)**: https://www.mi-3.com.au/25-03-2025/corelogic-rebrands-cotality-signalling-global-expansion-and-innovation — confirmed domain migration (MEDIUM confidence — industry news, multiple sources agree)
-- **CoreLogic data scraping litigation (BCI Media v CoreLogic)**: https://www.lawyerly.com.au/bci-media-takes-corelogic-to-court-over-data-scraping/ — signals active enforcement posture (MEDIUM confidence — Australian legal news)
-- **NAB Monthly Business Survey page structure** (August 2025 and April 2025): Direct WebFetch verification — capacity utilisation is in HTML article body, not PDF-only (HIGH confidence — verified directly)
-- **NAB URL patterns**: Confirmed consistent slug pattern `business.nab.com.au/nab-monthly-business-survey-{month}-{year}` with second domain `news.nab.com.au` for some releases; PDF paths vary across three different structures (HIGH confidence — verified via multiple direct URLs)
-- **ASX MarkitDigital endpoint live status**: Direct WebFetch to `https://asx.api.markitdigital.com/asx-research/1.0/derivatives/interest-rate/IB/futures?days=365&height=1&width=1` returned HTTP 200 with 17 contract items on 2026-02-24 (HIGH confidence — verified live)
-- **Phase 7 verification (07-VERIFICATION.md)**: Endpoint was 404 as of 2026-02-07 — confirming intermittent availability pattern (HIGH confidence — project documentation)
-- **ABS Total Value of Dwellings** as CoreLogic alternative: https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/total-value-dwellings — quarterly, compiled from CoreLogic sales data, open data terms (MEDIUM confidence — ABS official, but SDMX API dataflow ID needs verification before implementation)
-- **GitHub Actions concurrency documentation**: https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency — already implemented in project (HIGH confidence — official docs)
+- Direct codebase analysis: `pipeline/config.py` uses `DATA_DIR = Path("data")` (relative path — requires conftest.py patching strategy)
+- Direct codebase analysis: `pipeline/utils/http_client.py` `create_session()` — injection point for HTTP mocking in tests
+- Direct codebase analysis: `pipeline/ingest/nab_scraper.py` and `corelogic_scraper.py` — pdfplumber imported lazily inside functions (test-safe pattern)
+- Direct codebase analysis: `pipeline/main.py` tiered failure handling — unit tests must not test against real API responses or test becomes an integration test of Australian government APIs
+- pytest documentation — `pytest.mark` and `addopts` for test tier separation (HIGH confidence — official docs)
+- ruff documentation — `--select` / `--ignore` for baseline configuration (HIGH confidence — official docs)
+- Established pattern: pre-commit framework vs. manual `.git/hooks/` — manual hooks are simpler for a single-developer project; `pre-commit` framework adds complexity without benefit at this scale
+- `responses` library — HTTP mocking for `requests`-based code (HIGH confidence — widely used, well-documented)
+- ESLint flat config documentation — `env: { browser: true }` requirement for browser JS (HIGH confidence — official docs)
 
 ---
-*Pitfalls research for: Australian Economic Data Scraping (CoreLogic, NAB, ASX) — v1.1 milestone*
+*Pitfalls research for: Adding local CI and test infrastructure (v2.0 milestone) — rba-hawko-meter*
 *Researched: 2026-02-24*
