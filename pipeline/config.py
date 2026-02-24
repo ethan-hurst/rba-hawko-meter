@@ -93,6 +93,15 @@ ABS_CONFIG = {
         "description": "Building Approvals, total new residential dwellings, Australia (monthly, original)",
         "critical": False,
     },
+    "rppi": {
+        "dataflow": "RPPI",
+        "key": "1.3.100.Q",
+        "params": {"startPeriod": "2002", "detail": "dataonly"},
+        "filters": {},
+        "output_file": "corelogic_housing.csv",
+        "description": "Residential Property Price Index, national weighted average (quarterly)",
+        "critical": False,
+    },
 }
 
 # Source metadata for all data sources
@@ -177,10 +186,10 @@ INDICATOR_CONFIG = {
 # Optional indicators (stubs -- csv_file=None until scrapers implemented)
 OPTIONAL_INDICATOR_CONFIG = {
     "housing": {
-        "csv_file": None,
+        "csv_file": "corelogic_housing.csv",
         "normalize": "yoy_pct_change",
-        "frequency": "monthly",
-        "yoy_periods": 12,
+        "frequency": "quarterly",
+        "yoy_periods": 4,
         "description": "Housing prices YoY % change",
     },
     "business_confidence": {

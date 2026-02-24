@@ -147,7 +147,24 @@ def build_gauge_entry(name, latest_row, z_df, weight_config):
         hg = zscore_to_gauge(hz)
         history.append(round(hg, 1))
 
-    return {
+    # Source attribution for housing indicator
+    data_source = None
+    stale_display = None
+    if name == 'housing':
+        import pandas as _pd
+        csv_path = DATA_DIR / "corelogic_housing.csv"
+        if csv_path.exists():
+            raw_df = _pd.read_csv(csv_path)
+            if 'source' in raw_df.columns and len(raw_df) > 0:
+                raw_df['date'] = _pd.to_datetime(raw_df['date'])
+                latest_raw = raw_df.sort_values('date').iloc[-1]
+                data_source = latest_raw.get('source', 'ABS')
+        # Map source to display name
+        if data_source == 'ABS':
+            data_source = 'ABS RPPI'
+        stale_display = 'quarter_only'
+
+    entry = {
         'value': round(gauge_value, 1),
         'zone': zone_id,
         'zone_label': zone_label,
@@ -162,6 +179,11 @@ def build_gauge_entry(name, latest_row, z_df, weight_config):
         'interpretation': interpretation,
         'history': history,
     }
+    if data_source is not None:
+        entry['data_source'] = data_source
+    if stale_display is not None:
+        entry['stale_display'] = stale_display
+    return entry
 
 
 def build_asx_futures_entry():

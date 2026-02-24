@@ -203,6 +203,17 @@ def fetch_building_approvals() -> pd.DataFrame:
     )
 
 
+def fetch_rppi() -> pd.DataFrame:
+    """Fetch ABS Residential Property Price Index (national, quarterly)."""
+    config = ABS_CONFIG["rppi"]
+    return fetch_abs_series(
+        config["dataflow"],
+        config["key"],
+        config.get("params"),
+        config.get("filters")
+    )
+
+
 # Fetcher registry
 FETCHERS = {
     'cpi': (fetch_cpi, ABS_CONFIG["cpi"]["output_file"]),
@@ -210,6 +221,7 @@ FETCHERS = {
     'household_spending': (fetch_household_spending, ABS_CONFIG["household_spending"]["output_file"]),
     'wage_price_index': (fetch_wage_price_index, ABS_CONFIG["wage_price_index"]["output_file"]),
     'building_approvals': (fetch_building_approvals, ABS_CONFIG["building_approvals"]["output_file"]),
+    'rppi': (fetch_rppi, ABS_CONFIG["rppi"]["output_file"]),
 }
 
 

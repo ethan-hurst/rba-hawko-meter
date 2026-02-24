@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-02-24T05:38:57.752003Z",
+  "generated_at": "2026-02-24T06:38:24.954222Z",
   "pipeline_version": "1.0.0",
   "overall": {
-    "hawk_score": 48.9,
+    "hawk_score": 58.0,
     "zone": "neutral",
     "zone_label": "Balanced",
     "verdict": "Economic indicators are broadly balanced",
@@ -148,6 +148,36 @@
         77.1,
         57.9
       ]
+    },
+    "housing": {
+      "value": 100.0,
+      "zone": "hot",
+      "zone_label": "Strong hawkish pressure",
+      "z_score": 3.457,
+      "raw_value": 23.67,
+      "raw_unit": "% YoY",
+      "weight": 0.15,
+      "polarity": 1,
+      "data_date": "2021-10-01",
+      "staleness_days": 1607,
+      "confidence": "HIGH",
+      "interpretation": "Housing prices well above trend",
+      "history": [
+        12.9,
+        12.7,
+        23.1,
+        44.0,
+        56.0,
+        53.6,
+        49.5,
+        47.8,
+        58.3,
+        84.0,
+        100.0,
+        100.0
+      ],
+      "data_source": "ABS RPPI",
+      "stale_display": "quarter_only"
     }
   },
   "weights": {
@@ -168,9 +198,8 @@
     ],
     "mapping": "linear",
     "statistics": "robust (median/MAD)",
-    "indicators_available": 5,
+    "indicators_available": 6,
     "indicators_missing": [
-      "housing",
       "business_confidence"
     ]
   },
