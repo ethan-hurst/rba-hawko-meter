@@ -30,10 +30,11 @@ Delivered: Automated data pipeline (5 ABS indicators + RBA cash rate), interacti
   2. The dashboard "What Markets Expect" section shows an implied rate percentage and cut/hold/hike probability bars drawn from fresh data, not placeholders
   3. The pipeline logs a warning (and pipeline still exits cleanly) when `asx_futures.csv` has no rows newer than 14 days
   4. The dashboard displays probability bars for the next 3-4 upcoming RBA meetings, not just the soonest one
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 08-01: TBD
+- [ ] 08-01-PLAN.md — Pipeline staleness detection + multi-meeting engine extension + CI freshness assertion
+- [ ] 08-02-PLAN.md — Frontend multi-meeting table with traffic light stacked bars + test updates
 
 ---
 
@@ -76,6 +77,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-7. MVP Phases | v1.0 | 19/19 | Complete | 2026-02-24 |
-| 8. ASX Futures Live Data | v1.1 | 0/? | Not started | - |
+| 8. ASX Futures Live Data | v1.1 | 0/2 | Planning complete | - |
 | 9. Housing Prices Gauge | v1.1 | 0/? | Not started | - |
 | 10. NAB Capacity Utilisation Gauge | v1.1 | 0/? | Not started | - |
