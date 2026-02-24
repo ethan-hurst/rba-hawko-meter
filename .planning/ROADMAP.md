@@ -66,10 +66,11 @@ Plans:
   2. The survey URL is discovered by crawling the NAB tag archive page, not constructed from a date template — a hardcoded URL pattern never appears in the scraper code
   3. The gauge label shows a trend indicator ("ABOVE long-run average of ~81%" or "BELOW long-run average of ~81%") based on the latest reading
   4. When HTML extraction fails for a given month, the scraper attempts PDF extraction and recovers the capacity utilisation figure without the pipeline failing
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 10-01: TBD
+- [ ] 10-01-PLAN.md — NAB scraper rewrite (URL discovery + HTML extraction + PDF fallback + backfill) + config wiring
+- [ ] 10-02-PLAN.md — Frontend gauge customisation (trend label + direction + source attribution) + Playwright tests
 
 ---
 
@@ -80,4 +81,4 @@ Plans:
 | 1-7. MVP Phases | v1.0 | 19/19 | Complete | 2026-02-24 |
 | 8. ASX Futures Live Data | 2/2 | Complete   | 2026-02-24 | - |
 | 9. Housing Prices Gauge | 2/2 | Complete   | 2026-02-24 | - |
-| 10. NAB Capacity Utilisation Gauge | v1.1 | 0/? | Not started | - |
+| 10. NAB Capacity Utilisation Gauge | v1.1 | 0/2 | Not started | - |
