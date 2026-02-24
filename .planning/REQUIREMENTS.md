@@ -69,34 +69,34 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | — | Pending |
-| FOUND-02 | — | Pending |
-| FOUND-03 | — | Pending |
-| FOUND-04 | — | Pending |
-| FOUND-05 | — | Pending |
-| UNIT-01 | — | Pending |
-| UNIT-02 | — | Pending |
-| UNIT-03 | — | Pending |
-| UNIT-04 | — | Pending |
-| UNIT-05 | — | Pending |
-| LINT-01 | — | Pending |
-| LINT-02 | — | Pending |
-| LINT-03 | — | Pending |
-| LINT-04 | — | Pending |
-| LIVE-01 | — | Pending |
-| LIVE-02 | — | Pending |
-| LIVE-03 | — | Pending |
-| LIVE-04 | — | Pending |
-| HOOK-01 | — | Pending |
-| HOOK-02 | — | Pending |
-| HOOK-03 | — | Pending |
-| HOOK-04 | — | Pending |
+| FOUND-01 | Phase 11 | Pending |
+| FOUND-02 | Phase 11 | Pending |
+| FOUND-03 | Phase 11 | Pending |
+| FOUND-04 | Phase 11 | Pending |
+| FOUND-05 | Phase 11 | Pending |
+| UNIT-01 | Phase 12 | Pending |
+| UNIT-02 | Phase 12 | Pending |
+| UNIT-03 | Phase 12 | Pending |
+| UNIT-04 | Phase 12 | Pending |
+| UNIT-05 | Phase 12 | Pending |
+| LINT-01 | Phase 13 | Pending |
+| LINT-02 | Phase 13 | Pending |
+| LINT-03 | Phase 13 | Pending |
+| LINT-04 | Phase 13 | Pending |
+| LIVE-01 | Phase 14 | Pending |
+| LIVE-02 | Phase 14 | Pending |
+| LIVE-03 | Phase 14 | Pending |
+| LIVE-04 | Phase 14 | Pending |
+| HOOK-01 | Phase 15 | Pending |
+| HOOK-02 | Phase 15 | Pending |
+| HOOK-03 | Phase 15 | Pending |
+| HOOK-04 | Phase 15 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22 ⚠️
+- Mapped to phases: 22
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after initial definition*
+*Last updated: 2026-02-24 after roadmap creation (all 22 requirements mapped)*
