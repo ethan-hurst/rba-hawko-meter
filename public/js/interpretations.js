@@ -1,6 +1,6 @@
 /**
  * InterpretationsModule - Verdict rendering, ASX futures table, metric interpretations.
- * Uses safe DOM methods throughout (no innerHTML).
+ * Uses safe DOM methods throughout (createElement/textContent only).
  */
 var InterpretationsModule = (function () {
   'use strict';
@@ -84,20 +84,57 @@ var InterpretationsModule = (function () {
   }
 
   /**
-   * Render ASX Futures probability table.
+   * Create a stacked traffic-light probability bar.
+   * @param {number} probCut - Cut probability (0-100)
+   * @param {number} probHold - Hold probability (0-100)
+   * @param {number} probHike - Hike probability (0-100)
+   * @returns {HTMLElement} Stacked bar container element
+   */
+  function createStackedBar(probCut, probHold, probHike) {
+    var TRAFFIC_COLORS = {
+      cut: '#10b981',
+      hold: '#f59e0b',
+      hike: '#ef4444'
+    };
+
+    var bar = document.createElement('div');
+    bar.className = 'flex rounded overflow-hidden w-full';
+    bar.style.height = '16px';
+    bar.style.minWidth = '120px';
+
+    var segments = [
+      { prob: probCut, color: TRAFFIC_COLORS.cut },
+      { prob: probHold, color: TRAFFIC_COLORS.hold },
+      { prob: probHike, color: TRAFFIC_COLORS.hike }
+    ];
+
+    segments.forEach(function (seg) {
+      if (seg.prob > 0) {
+        var div = document.createElement('div');
+        div.style.flex = String(seg.prob);
+        div.style.backgroundColor = seg.color;
+        bar.appendChild(div);
+      }
+    });
+
+    return bar;
+  }
+
+  /**
+   * Render ASX Futures multi-meeting probability table with traffic light stacked bars.
    * @param {string} containerId - DOM element ID
-   * @param {Object|null} asxData - { current_rate, implied_rate, probabilities, source, source_date, next_meeting }
+   * @param {Object|null} asxData - { current_rate, meetings[], data_date, ... }
    */
   function renderASXTable(containerId, asxData) {
+    var TRAFFIC_COLORS = {
+      cut: '#10b981',
+      hold: '#f59e0b',
+      hike: '#ef4444'
+    };
+
     var container = document.getElementById(containerId);
     if (!container) return;
     container.textContent = '';
-
-    if (!asxData || !asxData.probabilities) {
-      container.style.display = 'none';
-      return;
-    }
-
     container.style.display = '';
 
     var heading = document.createElement('h3');
@@ -105,79 +142,176 @@ var InterpretationsModule = (function () {
     heading.textContent = 'What Markets Expect';
     container.appendChild(heading);
 
+    if (!asxData || !asxData.meetings || asxData.meetings.length === 0) {
+      var placeholder = document.createElement('p');
+      placeholder.className = 'text-sm text-gray-500 italic';
+      placeholder.textContent = 'Market futures data currently unavailable';
+      container.appendChild(placeholder);
+      return;
+    }
+
+    if (asxData.current_rate != null) {
+      var currentRate = document.createElement('p');
+      currentRate.className = 'text-xs text-gray-400 mb-3';
+      currentRate.textContent = 'Current cash rate: ' + asxData.current_rate.toFixed(2) + '%';
+      container.appendChild(currentRate);
+    }
+
     var subline = document.createElement('p');
     subline.className = 'text-xs text-gray-500 mb-3';
     subline.textContent = 'Based on ASX 30 Day Interbank Cash Rate Futures pricing';
     container.appendChild(subline);
 
-    var probs = asxData.probabilities;
-    var outcomes = [
-      { label: 'Rate Cut (-0.25%)', prob: probs.cut, color: '#60a5fa' },
-      { label: 'Hold (unchanged)', prob: probs.hold, color: '#9ca3af' },
-      { label: 'Rate Hike (+0.25%)', prob: probs.hike, color: '#f87171' }
-    ];
-
-    var maxProb = Math.max(probs.cut || 0, probs.hold || 0, probs.hike || 0);
+    var scrollWrapper = document.createElement('div');
+    scrollWrapper.className = 'overflow-x-auto';
 
     var table = document.createElement('table');
     table.className = 'w-full text-sm';
+    table.style.minWidth = '480px';
 
     var thead = document.createElement('thead');
     var headRow = document.createElement('tr');
-    headRow.className = 'border-b border-finance-border';
 
-    var thOutcome = document.createElement('th');
-    thOutcome.className = 'text-left py-2 text-gray-400 font-medium';
-    thOutcome.textContent = 'Outcome';
+    var columns = [
+      { text: 'Meeting', style: null },
+      { text: 'Implied Rate', style: null },
+      { text: 'Change', style: null },
+      { text: 'Probability', style: 'minWidth:180px' }
+    ];
 
-    var thProb = document.createElement('th');
-    thProb.className = 'text-right py-2 text-gray-400 font-medium';
-    thProb.textContent = 'Probability';
+    columns.forEach(function (col) {
+      var th = document.createElement('th');
+      th.className = 'text-left py-2 text-gray-400 font-medium';
+      th.textContent = col.text;
+      if (col.style) {
+        th.style.minWidth = '180px';
+      }
+      headRow.appendChild(th);
+    });
 
-    headRow.appendChild(thOutcome);
-    headRow.appendChild(thProb);
     thead.appendChild(headRow);
     table.appendChild(thead);
 
     var tbody = document.createElement('tbody');
-    outcomes.forEach(function (outcome) {
+
+    asxData.meetings.forEach(function (meeting, index) {
       var row = document.createElement('tr');
       row.className = 'border-b border-finance-border/50';
 
-      var isHighest = outcome.prob === maxProb;
-      if (isHighest) {
-        row.style.borderLeft = '3px solid ' + outcome.color;
+      if (index === 0) {
+        row.className += ' border-l-2 border-finance-accent';
+        row.style.backgroundColor = 'rgba(26, 26, 26, 0.5)';
       }
 
-      var labelCell = document.createElement('td');
-      labelCell.className = 'py-2 pl-2';
-      labelCell.style.color = isHighest ? outcome.color : '#9ca3af';
-      labelCell.textContent = outcome.label;
+      // Meeting date cell
+      var dateCell = document.createElement('td');
+      dateCell.className = 'py-2 pl-2 text-gray-300';
+      dateCell.textContent = meeting.meeting_date_label;
+      row.appendChild(dateCell);
 
+      // Implied rate cell
+      var rateCell = document.createElement('td');
+      rateCell.className = 'py-2 text-gray-300 font-mono';
+      rateCell.textContent = meeting.implied_rate.toFixed(2) + '%';
+      row.appendChild(rateCell);
+
+      // Change cell with sign and color
+      var changeCell = document.createElement('td');
+      changeCell.className = 'py-2 font-mono';
+      var changeBp = meeting.change_bp;
+      var changeText = (changeBp >= 0 ? '+' : '') + changeBp.toFixed(1) + 'bp';
+      changeCell.textContent = changeText;
+      if (changeBp < -5) {
+        changeCell.style.color = '#10b981';
+      } else if (changeBp > 5) {
+        changeCell.style.color = '#ef4444';
+      } else {
+        changeCell.style.color = '#9ca3af';
+      }
+      row.appendChild(changeCell);
+
+      // Probability cell: stacked bar + label
       var probCell = document.createElement('td');
-      probCell.className = 'py-2 text-right font-mono';
-      probCell.style.color = isHighest ? '#f3f4f6' : '#9ca3af';
-      probCell.textContent = outcome.prob != null ? percentFormatter.format(outcome.prob / 100) : '--';
+      probCell.className = 'py-2';
 
-      row.appendChild(labelCell);
+      var probCut = meeting.probability_cut;
+      var probHold = meeting.probability_hold;
+      var probHike = meeting.probability_hike;
+
+      var stackedBar = createStackedBar(probCut, probHold, probHike);
+      probCell.appendChild(stackedBar);
+
+      // Percentage labels below bar
+      var labelParts = [];
+      if (probCut > 0) {
+        labelParts.push({ text: Math.round(probCut) + '% cut', color: TRAFFIC_COLORS.cut });
+      }
+      if (probHold > 0) {
+        labelParts.push({ text: Math.round(probHold) + '% hold', color: TRAFFIC_COLORS.hold });
+      }
+      if (probHike > 0) {
+        labelParts.push({ text: Math.round(probHike) + '% hike', color: TRAFFIC_COLORS.hike });
+      }
+
+      var labelP = document.createElement('p');
+      labelP.className = 'text-xs text-gray-500 mt-1';
+
+      labelParts.forEach(function (part, i) {
+        if (i > 0) {
+          var dot = document.createTextNode(' \u00b7 ');
+          labelP.appendChild(dot);
+        }
+        var span = document.createElement('span');
+        span.style.color = part.color;
+        span.textContent = part.text;
+        labelP.appendChild(span);
+      });
+
+      probCell.appendChild(labelP);
       row.appendChild(probCell);
       tbody.appendChild(row);
     });
+
     table.appendChild(tbody);
-    container.appendChild(table);
+    scrollWrapper.appendChild(table);
+    container.appendChild(scrollWrapper);
 
-    if (asxData.implied_rate != null) {
-      var implied = document.createElement('p');
-      implied.className = 'text-sm text-gray-400 mt-3';
-      implied.textContent = 'Implied rate: ' + asxData.implied_rate.toFixed(2) + '%';
-      container.appendChild(implied);
-    }
+    // Legend row
+    var legend = document.createElement('div');
+    legend.className = 'flex gap-4 mt-2 text-xs text-gray-500';
 
-    var citation = document.createElement('p');
-    citation.className = 'text-xs text-gray-600 mt-1';
-    citation.textContent = 'Source: ' + (asxData.source || 'ASX') +
-      (asxData.source_date ? ' (' + asxData.source_date + ')' : '');
-    container.appendChild(citation);
+    var legendItems = [
+      { color: TRAFFIC_COLORS.cut, label: 'Cut' },
+      { color: TRAFFIC_COLORS.hold, label: 'Hold' },
+      { color: TRAFFIC_COLORS.hike, label: 'Hike' }
+    ];
+
+    legendItems.forEach(function (item) {
+      var itemDiv = document.createElement('div');
+
+      var dot = document.createElement('span');
+      dot.style.display = 'inline-block';
+      dot.style.width = '8px';
+      dot.style.height = '8px';
+      dot.style.borderRadius = '50%';
+      dot.style.backgroundColor = item.color;
+      dot.style.marginRight = '4px';
+      dot.style.verticalAlign = 'middle';
+
+      var labelNode = document.createTextNode(item.label);
+
+      itemDiv.appendChild(dot);
+      itemDiv.appendChild(labelNode);
+      legend.appendChild(itemDiv);
+    });
+
+    container.appendChild(legend);
+
+    // "Data as of" footer — always visible
+    var footer = document.createElement('p');
+    footer.className = 'text-xs text-gray-500 mt-3';
+    footer.textContent = 'Data as of ' + formatAusDate(asxData.data_date);
+    container.appendChild(footer);
   }
 
   /**
