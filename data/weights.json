@@ -39,7 +39,7 @@
     "weight": 0.05,
     "polarity": 1,
     "label": "Business Confidence",
-    "description": "Forward-looking sentiment. High confidence signals expanding demand and potential pricing pressure."
+    "description": "NAB capacity utilisation. High utilisation signals inflation pressure from limited spare capacity."
   },
   "asx_futures": {
     "weight": 0.10,

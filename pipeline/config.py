@@ -193,11 +193,11 @@ OPTIONAL_INDICATOR_CONFIG = {
         "description": "Housing prices YoY % change",
     },
     "business_confidence": {
-        "csv_file": None,
+        "csv_file": "nab_capacity.csv",
         "normalize": "direct",
-        "frequency": "quarterly",
+        "frequency": "monthly",
         "yoy_periods": None,
-        "description": "NAB Business Confidence index",
+        "description": "NAB Capacity Utilisation %",
     },
     "asx_futures": {
         "csv_file": "asx_futures.csv",

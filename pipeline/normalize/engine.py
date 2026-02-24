@@ -271,7 +271,15 @@ def process_indicator(name, config, weight_config):
     if len(df) == 0:
         return None, None
 
-    df = compute_rolling_zscores(df)
+    # For indicators with limited history (fewer than ZSCORE_MIN_YEARS * 4 quarters),
+    # lower the min_quarters requirement so a z-score can still be computed.
+    # This applies to newly-wired optional indicators like business_confidence.
+    from pipeline.config import ZSCORE_MIN_YEARS
+    min_q = ZSCORE_MIN_YEARS * 4  # default: 20 quarters
+    if len(df) < min_q:
+        min_q = max(2, len(df) - 1)  # need at least 2 observations in the window
+
+    df = compute_rolling_zscores(df, min_quarters=min_q)
 
     # Get valid Z-score rows
     valid = df.dropna(subset=['z_score'])
