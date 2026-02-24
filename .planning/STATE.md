@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 8 of 10 (ASX Futures Live Data)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-02-24 — v1.1 roadmap created; phases 8-10 defined; 13/13 requirements mapped
+Plan: 1 of ? in current phase (08-01 complete)
+Status: In progress
+Last activity: 2026-02-24 — 08-01 complete: multi-meeting pipeline with staleness detection and CI freshness assertion
 
 Progress: [███████░░░] 70% (7 of 10 phases complete — v1.0 shipped)
 
@@ -23,11 +23,11 @@ Progress: [███████░░░] 70% (7 of 10 phases complete — v1.0
 - v1.0 timeline: 20 days (2026-02-04 → 2026-02-24)
 - Commits: 81
 
-**v1.1 (not yet started):**
+**v1.1 (in progress):**
 
 | Phase | Plans | Status |
 |-------|-------|--------|
-| 8. ASX Futures Live Data | TBD | Not started |
+| 8. ASX Futures Live Data | 1+ | In progress (08-01 done) |
 | 9. Housing Prices Gauge | TBD | Not started |
 | 10. NAB Capacity Utilisation Gauge | TBD | Not started |
 
@@ -39,6 +39,9 @@ Progress: [███████░░░] 70% (7 of 10 phases complete — v1.0
 - [v1.0] ASX futures excluded from hawk score — market-derived, not economic indicator; displayed separately in "What Markets Expect"
 - [v1.1] NAB HTML extraction first — capacity utilisation figure is inline in HTML body; PDF is fallback only, not primary approach
 - [v1.1] URL discovery required for NAB — never construct NAB URLs from date templates; always discover via tag archive page
+- [08-01] CI freshness step uses continue-on-error: true — intermittent ASX outages must not block data commits
+- [08-01] meetings[] contract extension is additive — all existing single-meeting fields preserved for backward compatibility
+- [08-01] Cross-platform day formatting via str(dt.day) — %-d strftime is Linux/macOS only, crashes on Windows CI
 
 ### Research Flags (check before implementing)
 
@@ -54,5 +57,5 @@ Progress: [███████░░░] 70% (7 of 10 phases complete — v1.0
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: v1.1 roadmap created; all 13 requirements mapped to phases 8-10; ready to plan Phase 8
+Stopped at: Completed 08-01-PLAN.md — multi-meeting pipeline, staleness detection, CI freshness assertion
 Resume file: None

@@ -9,10 +9,10 @@ Requirements for milestone v1.1 — Full Indicator Coverage. Each maps to roadma
 
 ### ASX Futures
 
-- [ ] **ASX-01**: ASX MarkitDigital endpoint verified working in GitHub Actions CI environment
+- [x] **ASX-01**: ASX MarkitDigital endpoint verified working in GitHub Actions CI environment
 - [ ] **ASX-02**: Dashboard "What Markets Expect" section displays fresh implied rate and cut/hold/hike probabilities
-- [ ] **ASX-03**: Pipeline warns if `asx_futures.csv` has no rows newer than 14 days
-- [ ] **ASX-04**: Dashboard shows probability for next 3-4 upcoming RBA meetings, not just the next one
+- [x] **ASX-03**: Pipeline warns if `asx_futures.csv` has no rows newer than 14 days
+- [x] **ASX-04**: Dashboard shows probability for next 3-4 upcoming RBA meetings, not just the next one
 
 ### Housing Prices
 
@@ -56,10 +56,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ASX-01 | Phase 8 | Pending |
+| ASX-01 | Phase 8 | Complete |
 | ASX-02 | Phase 8 | Pending |
-| ASX-03 | Phase 8 | Pending |
-| ASX-04 | Phase 8 | Pending |
+| ASX-03 | Phase 8 | Complete |
+| ASX-04 | Phase 8 | Complete |
 | HOUS-01 | Phase 9 | Pending |
 | HOUS-02 | Phase 9 | Pending |
 | HOUS-03 | Phase 9 | Pending |
