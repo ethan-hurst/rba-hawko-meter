@@ -12,7 +12,7 @@ This roadmap transforms raw economic data into a simple traffic-light dashboard 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Data Pipeline** - Automated data ingestion skeleton
+- [x] **Phase 1: Foundation & Data Pipeline** - Automated data ingestion skeleton
 - [ ] **Phase 2: Core Dashboard** - Static UI with rate display and historical charts
 - [ ] **Phase 3: Data Normalization & Z-Scores** - Statistical engine for metric transformation
 - [ ] **Phase 4: Hawk-O-Meter Gauges** - Traffic-light visualization system
@@ -36,11 +36,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 5 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Foundation scaffolding, shared utilities, RBA and ABS ingestors
-- [ ] 01-02-PLAN.md — Web scrapers (CoreLogic, NAB, ASX Futures)
-- [ ] 01-03-PLAN.md — Pipeline orchestrator, GitHub Actions workflows, historical backfill
-- [ ] 01-04-PLAN.md — Gap closure: Building Approvals implementation (BA_GCCSA dataflow)
-- [ ] 01-05-PLAN.md — Gap closure: GitHub Actions workflow validation and first execution
+- [x] 01-01-PLAN.md — Foundation scaffolding, shared utilities, RBA and ABS ingestors
+- [x] 01-02-PLAN.md — Web scrapers (CoreLogic, NAB, ASX Futures)
+- [x] 01-03-PLAN.md — Pipeline orchestrator, GitHub Actions workflows, historical backfill
+- [x] 01-04-PLAN.md — Gap closure: Building Approvals implementation (BA_GCCSA dataflow)
+- [x] 01-05-PLAN.md — Gap closure: GitHub Actions workflow validation and first execution
 
 ### Phase 2: Core Dashboard
 **Goal**: Users can view current cash rate and historical trends on a live Netlify URL
@@ -150,7 +150,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Data Pipeline | 5/5 | Complete | 2026-02-06 |
+| 1. Foundation & Data Pipeline | 5/5 | Complete   | 2026-02-24 |
 | 2. Core Dashboard | 2/2 | Complete | 2026-02-06 |
 | 3. Data Normalization & Z-Scores | 2/2 | Complete | 2026-02-06 |
 | 4. Hawk-O-Meter Gauges | 2/2 | Complete | 2026-02-06 |
