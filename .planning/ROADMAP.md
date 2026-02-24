@@ -61,7 +61,10 @@ Plans:
   3. `status.json` with a missing required key or an out-of-range `hawk_score` fails the schema validation test
   4. A `csv_handler` test writes to a temp CSV and reads it back — the live `data/` directory is untouched
   5. `pytest tests/python/ -m "not live"` completes in under 10 seconds on first run (no slow I/O or HTTP)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 12-01-PLAN.md -- Z-score + gauge unit tests (calculate_mad, robust_zscore, zscore_to_gauge, classify_zone, compute_hawk_score)
+- [ ] 12-02-PLAN.md -- Ratios + CSV handler + schema validation tests (YoY normalization, hybrid Cotality/ABS, append_to_csv, status.json jsonschema)
 
 ### Phase 13: Linting Baseline
 **Goal**: Python and JavaScript linting runs clean on the entire codebase with no pre-existing violations suppressed
@@ -105,7 +108,7 @@ Plans:
 | 9. Housing Prices Gauge | v1.1 | 2/2 | Complete | 2026-02-24 |
 | 10. NAB Capacity Utilisation Gauge | v1.1 | 2/2 | Complete | 2026-02-24 |
 | 11. Test Foundation | v2.0 | Complete    | 2026-02-24 | 2026-02-25 |
-| 12. Python Unit Tests | v2.0 | 0/? | Not started | - |
+| 12. Python Unit Tests | v2.0 | 0/2 | Planned | - |
 | 13. Linting Baseline | v2.0 | 0/? | Not started | - |
 | 14. Live Verification | v2.0 | 0/? | Not started | - |
 | 15. Pre-Push Hook | v2.0 | 0/? | Not started | - |
