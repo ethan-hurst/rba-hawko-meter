@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** "Data, not opinion." Empowers laypeople to understand interest rate drivers without relying on media sensationalism or biased advice.
-**Current focus:** Phase 9 — Housing Prices Gauge (v1.1 in progress)
+**Current focus:** Phase 9 complete — moving to Phase 10 NAB Capacity Utilisation Gauge (v1.1 in progress)
 
 ## Current Position
 
-Phase: 9 of 10 (Housing Prices Gauge)
-Plan: 1 of TBD in current phase (09-01 complete)
-Status: In progress
-Last activity: 2026-02-24 — 09-01 complete: ABS RPPI pipeline integration, housing gauge activated, frontend directional labels + source attribution, Playwright tests
+Phase: 9 of 10 (Housing Prices Gauge — COMPLETE)
+Plan: 2 of 2 in phase 09 (09-01 ABS RPPI, 09-02 Cotality HVI scraper — both complete)
+Status: In progress (Phase 9 done, Phase 10 pending)
+Last activity: 2026-02-24 — 09-02 complete: Cotality HVI PDF scraper, hybrid normalization, 26/26 Playwright tests, HOUS-03+HOUS-04 satisfied
 
 Progress: [████████░░] 75% (7.5 of 10 phases complete — v1.0 shipped, v1.1 in progress)
 
@@ -28,7 +28,7 @@ Progress: [████████░░] 75% (7.5 of 10 phases complete — v1
 | Phase | Plans | Status |
 |-------|-------|--------|
 | 8. ASX Futures Live Data | 2 | Complete (08-01 pipeline, 08-02 frontend table) |
-| 9. Housing Prices Gauge | TBD | In progress (09-01 complete: ABS RPPI + frontend) |
+| 9. Housing Prices Gauge | 2 | Complete (09-01 ABS RPPI + frontend, 09-02 Cotality HVI scraper) |
 | 10. NAB Capacity Utilisation Gauge | TBD | Not started |
 
 ## Accumulated Context
@@ -47,19 +47,22 @@ Progress: [████████░░] 75% (7.5 of 10 phases complete — v1
 - [09-01] Neutral zone threshold is +/-1% YoY for housing STEADY label — conservative range, RISING in practice with ABS data at +23.67%
 - [09-01] data_source read from raw CSV in build_gauge_entry() — z-score pipeline strips source column; raw CSV read is the correct pattern
 - [09-01] stale_display: 'quarter_only' controls amber border suppression — only set for housing; toQuarterLabel() in JS doubles as staleness signal
+- [Phase 09]: Cotality PDF scraper wired into automated pipeline (project owner approved: 'publicly available information')
+- [Phase 09]: Hybrid normalization in ratios.py separates ABS index rows from Cotality pre-computed YoY rows to prevent double-normalization
+- [Phase 09]: 4-candidate URL try-list for Cotality PDFs handles URL pattern inconsistency across monthly releases
 
 ### Research Flags (check before implementing)
 
 - Phase 9 (resolved): ABS RPPI SDMX key confirmed as `1.3.100.Q` (not `3.2.100.Q`) — 74 rows fetched successfully
-- Phase 9: HOUS-03/HOUS-04 (Cotality PDF) requires explicit project owner sign-off on ToS risk before any code is written
+- Phase 9 (resolved): HOUS-03/HOUS-04 (Cotality PDF) — project owner approved, scraper implemented, 9.4% YoY Feb 2026 data live
 - Phase 10: Manually verify NAB HTML regex matches the current month's page before committing Phase 10 implementation
 
 ### Blockers/Concerns
 
-- Cotality ToS (Clause 8.4d) prohibits scraping; HOUS-03/HOUS-04 are blocked until project owner documents risk decision
+None active — Cotality ToS blocker resolved (project owner approved, HOUS-03/HOUS-04 complete).
 
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 09-01-PLAN.md — ABS RPPI pipeline + housing gauge activation, frontend directional labels, source attribution, no amber border, 9/9 Playwright tests passing
+Stopped at: Completed 09-02-PLAN.md — Cotality HVI PDF scraper, hybrid normalization fix, HOUS-03+HOUS-04 satisfied, 26/26 Playwright tests passing. Phase 9 complete.
 Resume file: None
