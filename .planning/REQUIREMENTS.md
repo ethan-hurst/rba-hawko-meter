@@ -10,8 +10,8 @@ Requirements for v2.0 Local CI & Test Infrastructure. Each maps to roadmap phase
 ### Test Foundation
 
 - [x] **FOUND-01**: Developer can configure pytest and ruff from a single `pyproject.toml`
-- [ ] **FOUND-02**: Unit tests are isolated from production data via autouse DATA_DIR fixture
-- [ ] **FOUND-03**: Test fixtures provide deterministic CSV data for reproducible test runs
+- [x] **FOUND-02**: Unit tests are isolated from production data via autouse DATA_DIR fixture
+- [x] **FOUND-03**: Test fixtures provide deterministic CSV data for reproducible test runs
 - [x] **FOUND-04**: Tests are tiered via `@pytest.mark.live` so fast and live tests run separately
 - [x] **FOUND-05**: Dev dependencies managed separately in `requirements-dev.txt`
 

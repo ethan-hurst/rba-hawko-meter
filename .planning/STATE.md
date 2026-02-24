@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 11 (Test Foundation)
-Plan: 01 complete (1/2 plans done)
+Plan: 02 complete (2/2 plans done — Phase 11 complete)
 Status: In progress
-Last activity: 2026-02-25 — Plan 11-01 complete: pyproject.toml config hub + requirements-dev.txt
+Last activity: 2026-02-25 — Plan 11-02 complete: conftest.py + fixture CSVs + smoke tests
 
 ```
-v2.0 Progress: [=         ] 5%
-Phase 11 [=] Phase 12 [ ] Phase 13 [ ] Phase 14 [ ] Phase 15 [ ]
+v2.0 Progress: [==        ] 10%
+Phase 11 [==] Phase 12 [ ] Phase 13 [ ] Phase 14 [ ] Phase 15 [ ]
 ```
 
 ## Performance Metrics
@@ -50,6 +50,13 @@ Archived to PROJECT.md Key Decisions table. All v1.0 and v1.1 decisions preserve
 - ruff select E/F/W/B/I/UP with no ignores (clean slate baseline)
 - jsonschema included in requirements-dev.txt now (needed Phase 12) for one-command dev install
 
+**v2.0 decisions (Plan 11-02):**
+- Import pipeline.config as a module (not from...import) so monkeypatch targets module attribute
+- block_network blocks localhost too — no exceptions for non-live tests (per user decision)
+- FIXTURES_DIR uses Path(__file__).parent to avoid CWD sensitivity
+- Fixture CSVs are real production snapshots, not synthetic data (per user decision)
+- nab_capacity.csv copied in full (only 7 rows exist in production)
+
 ### Critical Context for v2.0
 
 - `DATA_DIR = Path("data")` in `pipeline/config.py` is a relative path — all tests must patch this via autouse fixture or they silently read/write live CSV files
@@ -65,6 +72,6 @@ None active.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Plan 11-01 complete — pyproject.toml and requirements-dev.txt created
-Resume file: .planning/phases/11-test-foundation/11-01-SUMMARY.md
-Next action: Execute plan 11-02 (conftest.py + fixture CSVs + smoke tests)
+Stopped at: Plan 11-02 complete — conftest.py + fixture CSVs + smoke tests created
+Resume file: .planning/phases/11-test-foundation/11-02-SUMMARY.md
+Next action: Phase 11 complete — begin Phase 12 (Unit Tests)
