@@ -34,6 +34,22 @@ jobs:
       - name: Regenerate status.json
         run: python -m pipeline.normalize.engine
 
+      - name: Verify ASX data freshness
+        continue-on-error: true
+        run: |
+          python3 -c "
+          import pandas as pd
+          from datetime import datetime, timedelta
+          df = pd.read_csv('data/asx_futures.csv')
+          df['date'] = pd.to_datetime(df['date'])
+          latest = df['date'].max()
+          threshold = datetime.now() - timedelta(days=7)
+          if latest < threshold:
+              print(f'WARNING: Latest ASX data is {latest.date()}, older than 7 days')
+              exit(1)
+          print(f'OK: Latest ASX data is {latest.date()}')
+          "
+
       - name: Commit updated data
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
