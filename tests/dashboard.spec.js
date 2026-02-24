@@ -44,7 +44,7 @@ test.describe('Phase 4 — Hawk-O-Meter Gauges', () => {
     await expect(grid).toBeVisible();
 
     // Wait for metric cards to render (replaces the "Loading..." placeholder)
-    // 6 active cards (bg-finance-gray) + 1 placeholder card (bg-finance-gray/50) = 7 total
+    // 7 active cards (bg-finance-gray) + 0 placeholder cards = 7 total
     // METRIC_ORDER: inflation, wages, employment, housing, spending, building_approvals, business_confidence
     const allCards = grid.locator('[class*="bg-finance-gray"]');
     await expect(allCards).toHaveCount(7, { timeout: 15000 });
@@ -77,7 +77,7 @@ test.describe('Phase 4 — Hawk-O-Meter Gauges', () => {
     await page.goto('/');
 
     const grid = page.locator('#metric-gauges-grid');
-    // 6 active + 1 placeholder = 7 total
+    // 7 active + 0 placeholder = 7 total
     await expect(grid.locator('[class*="bg-finance-gray"]')).toHaveCount(7, { timeout: 15000 });
 
     // At 375px the grid should be single-column
@@ -116,7 +116,7 @@ test.describe('Phase 4 — Hawk-O-Meter Gauges', () => {
     await page.goto('/');
 
     const grid = page.locator('#metric-gauges-grid');
-    // 6 active + 1 placeholder = 7 total
+    // 7 active + 0 placeholder = 7 total
     await expect(grid.locator('[class*="bg-finance-gray"]')).toHaveCount(7, { timeout: 15000 });
 
     // Wages is the second card (index 1) — staleness_days=220 > 90 threshold
@@ -164,6 +164,39 @@ test.describe('Phase 9 — Housing Prices Gauge', () => {
     // Housing card should NOT have amber border even though data is >90 days old
     const classAttr = await housingCard.getAttribute('class');
     expect(classAttr).not.toContain('border-amber-500');
+  });
+
+});
+
+test.describe('Phase 10 — Business Conditions Gauge', () => {
+
+  test('business conditions gauge shows capacity utilisation trend label', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('#metric-gauges-grid');
+
+    const bcCard = page.locator('#metric-gauges-grid .bg-finance-gray').filter({ hasText: 'Business Conditions' });
+    await expect(bcCard).toBeVisible({ timeout: 15000 });
+
+    // Check trend label format: "XX.X% — ABOVE/BELOW avg" with optional direction
+    const interpretation = bcCard.locator('[id^="interp-business_confidence"]');
+    await expect(interpretation).toContainText(/\d+\.\d+% \u2014 (?:ABOVE|BELOW) avg/);
+
+    // Check source attribution
+    await expect(bcCard).toContainText('Source: NAB Monthly Business Survey');
+  });
+
+  test('business conditions gauge shows importance badge and why-it-matters text', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('#metric-gauges-grid');
+
+    const bcCard = page.locator('#metric-gauges-grid .bg-finance-gray').filter({ hasText: 'Business Conditions' });
+    await expect(bcCard).toBeVisible({ timeout: 15000 });
+
+    // Check importance badge (5% weight = "Lower importance")
+    await expect(bcCard).toContainText('Lower importance');
+
+    // Check why-it-matters text
+    await expect(bcCard).toContainText('capacity utilisation');
   });
 
 });

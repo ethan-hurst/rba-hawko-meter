@@ -21,7 +21,7 @@ var GaugesModule = (function () {
     housing: 'Housing',
     spending: 'Spending',
     building_approvals: 'Building Approvals',
-    business_confidence: 'Capacity'
+    business_confidence: 'Business Conditions'
   };
 
   /**

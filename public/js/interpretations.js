@@ -416,9 +416,25 @@ var InterpretationsModule = (function () {
         return 'Consumer spending is strong \u2014 which can push up prices';
 
       case 'business_confidence':
-        if (v < 40) return 'Business confidence is below average \u2014 businesses are cautious';
-        if (v <= 60) return 'Business confidence is around average levels';
-        return 'Business confidence is high \u2014 businesses are investing and hiring more';
+        // Capacity utilisation: show level + direction + month label
+        var cuVal = parseFloat(metricData.raw_value);
+        if (isNaN(cuVal)) return 'Capacity utilisation data unavailable';
+
+        var lra = metricData.long_run_avg || 81;
+        var aboveBelow = cuVal >= lra ? 'ABOVE' : 'BELOW';
+
+        // Direction from status.json (computed by engine.py)
+        var cuDirection = metricData.direction || '';
+        var dirText = cuDirection ? ', ' + cuDirection : '';
+
+        // Month label from data_date "(Jan 2026)"
+        var cuDate = new Date(metricData.data_date);
+        var monthLabel = '';
+        if (!isNaN(cuDate.getTime())) {
+          monthLabel = ' (' + cuDate.toLocaleString('en-AU', {month: 'short', year: 'numeric'}) + ')';
+        }
+
+        return cuVal.toFixed(1) + '% \u2014 ' + aboveBelow + ' avg' + dirText + monthLabel;
 
       default:
         return metricData.interpretation || GaugesModule.getDisplayLabel(metricId);
@@ -438,7 +454,7 @@ var InterpretationsModule = (function () {
       housing: 'Rapidly rising house prices can prompt the RBA to raise rates to cool the market.',
       employment: 'Low unemployment means a strong economy, which can lead to rate rises.',
       spending: 'When consumers spend more, it can push prices up and lead to rate rises.',
-      business_confidence: 'When businesses are confident, they invest and hire more, adding to inflation pressure.'
+      business_confidence: 'High capacity utilisation signals inflation pressure, making rate cuts less likely.'
     };
     return reasons[metricId] || null;
   }
@@ -479,6 +495,10 @@ var InterpretationsModule = (function () {
     // Housing: quarter-only staleness — suppress amber border per CONTEXT.md
     if (metricId === 'housing' && metricData.stale_display === 'quarter_only') {
       stale = false;
+    }
+    // Business conditions: 45-day staleness threshold (monthly data)
+    if (metricId === 'business_confidence' && metricData.staleness_days > 45) {
+      stale = true;
     }
 
     var card = document.createElement('div');
@@ -545,6 +565,14 @@ var InterpretationsModule = (function () {
       srcAttr.className = 'text-xs text-gray-500 mt-1';
       srcAttr.textContent = 'Source: ' + metricData.data_source;
       card.appendChild(srcAttr);
+    }
+
+    // Source attribution for business_confidence
+    if (metricId === 'business_confidence' && metricData.data_source) {
+      var bcSrcAttr = document.createElement('div');
+      bcSrcAttr.className = 'text-xs text-gray-500 mt-1';
+      bcSrcAttr.textContent = 'Source: ' + metricData.data_source;
+      card.appendChild(bcSrcAttr);
     }
 
     // Source citation with Australian date format

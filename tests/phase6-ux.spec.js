@@ -58,7 +58,7 @@ test.describe('Phase 6 — UX & Plain English Overhaul', () => {
     // At least one bullet gauge in the grid should contain "/100"
     const grid = page.locator('#metric-gauges-grid');
     await expect(grid).toBeVisible();
-    // 5 active cards (bg-finance-gray) + 2 placeholder cards (bg-finance-gray/50) = 7
+    // 7 active cards (bg-finance-gray) + 0 placeholder cards = 7
     const allCards = grid.locator('[class*="bg-finance-gray"]');
     await expect(allCards).toHaveCount(7, { timeout: 15000 });
 
@@ -202,10 +202,10 @@ test.describe('Phase 6 — UX & Plain English Overhaul', () => {
     }
     expect(foundAustralianDate).toBe(true);
 
-    // Data coverage notice should indicate 6 of 8 indicators (housing now active via Cotality HVI)
+    // Data coverage notice should indicate 7 of 8 indicators (business_confidence now active via NAB scraper)
     const coverageNotice = page.locator('#data-coverage-notice');
     await expect(coverageNotice).toBeVisible({ timeout: 15000 });
-    await expect(coverageNotice).toContainText('6 of 8 indicators');
+    await expect(coverageNotice).toContainText('7 of 8 indicators');
   });
 
   test('20. Placeholder cards for missing indicators', async ({ page }) => {
@@ -216,14 +216,9 @@ test.describe('Phase 6 — UX & Plain English Overhaul', () => {
     await expect(allCards).toHaveCount(7, { timeout: 15000 });
 
     // Count cards with "Data coming soon" text — placeholder cards use bg-finance-gray/50
-    // Housing is now active (Cotality HVI data), so only business_confidence remains as placeholder
+    // Both housing (Cotality HVI) and business_confidence (NAB scraper) are now active
     const placeholderCards = grid.locator('[class*="bg-finance-gray"]:has-text("Data coming soon")');
-    await expect(placeholderCards).toHaveCount(1); // business_confidence only
-
-    // Verify no placeholder card contains "ASX" (futures are benchmark only)
-    const placeholderText = await placeholderCards.allTextContents();
-    const placeholderString = placeholderText.join(' ');
-    expect(placeholderString).not.toContain('ASX');
+    await expect(placeholderCards).toHaveCount(0); // no more placeholder cards
   });
 
   test('21. Calculator bridge and jump link are present', async ({ page }) => {
