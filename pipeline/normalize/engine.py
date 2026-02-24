@@ -96,11 +96,11 @@ def generate_interpretation(indicator_name, zone, raw_value):
             'hot': 'Housing prices well above trend',
         },
         'business_confidence': {
-            'cold': 'Business confidence well below average',
-            'cool': 'Business confidence below average',
-            'neutral': 'Business confidence near average',
-            'warm': 'Business confidence above average',
-            'hot': 'Business confidence well above average',
+            'cold': 'Capacity utilisation well below long-run average',
+            'cool': 'Capacity utilisation below long-run average',
+            'neutral': 'Capacity utilisation near long-run average',
+            'warm': 'Capacity utilisation above long-run average',
+            'hot': 'Capacity utilisation significantly above long-run average',
         },
         'asx_futures': {
             'cold': 'Futures imply significant rate cuts ahead',
@@ -115,7 +115,7 @@ def generate_interpretation(indicator_name, zone, raw_value):
     return indicator_templates.get(zone, f'{indicator_name} data available')
 
 
-def build_gauge_entry(name, latest_row, z_df, weight_config):
+def build_gauge_entry(name, latest_row, z_df, weight_config, config=None):
     """
     Build a single gauge dict for status.json.
 
@@ -124,6 +124,7 @@ def build_gauge_entry(name, latest_row, z_df, weight_config):
         latest_row: Last valid row from Z-score DataFrame.
         z_df: Full Z-score DataFrame (for history extraction).
         weight_config: Weight config dict from weights.json.
+        config: Optional indicator config dict (used for indicator-specific enrichment).
 
     Returns:
         Dict with gauge metadata matching the status.json per-gauge schema.
@@ -183,6 +184,39 @@ def build_gauge_entry(name, latest_row, z_df, weight_config):
         entry['data_source'] = data_source
     if stale_display is not None:
         entry['stale_display'] = stale_display
+
+    # Business conditions: enrich with direction, long-run average, and source
+    if name == 'business_confidence':
+        import pandas as _pd
+        from pipeline.config import DATA_DIR as _DATA_DIR
+        _config = config or {}
+        csv_path = _DATA_DIR / _config.get('csv_file', '')
+        if csv_path.exists():
+            raw_df = _pd.read_csv(csv_path)
+            raw_df['date'] = _pd.to_datetime(raw_df['date'])
+            raw_df = raw_df.sort_values('date')
+            all_values = raw_df['value'].dropna()
+
+            # Long-run average — dynamic from CSV
+            long_run_avg = float(all_values.mean()) if len(all_values) >= 2 else 81.0
+            entry['long_run_avg'] = round(long_run_avg, 1)
+
+            # Direction: month-over-month change with 0.5pp STEADY threshold
+            if len(all_values) >= 2:
+                curr_val = float(all_values.iloc[-1])
+                prev_val = float(all_values.iloc[-2])
+                delta = curr_val - prev_val
+                if abs(delta) <= 0.5:
+                    entry['direction'] = 'STEADY'
+                elif delta > 0:
+                    entry['direction'] = 'RISING'
+                else:
+                    entry['direction'] = 'FALLING'
+            # If only 1 data point, omit direction (frontend handles gracefully)
+
+        entry['data_source'] = 'NAB Monthly Business Survey'
+        entry['raw_unit'] = '%'
+
     return entry
 
 
@@ -287,7 +321,7 @@ def process_indicator(name, config, weight_config):
         return None, None
 
     latest = valid.iloc[-1]
-    entry = build_gauge_entry(name, latest, df, weight_config)
+    entry = build_gauge_entry(name, latest, df, weight_config, config=config)
 
     return entry, entry['value']
 

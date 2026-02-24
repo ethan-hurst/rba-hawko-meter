@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-02-24T06:52:18.498129Z",
+  "generated_at": "2026-02-24T08:55:20.467697Z",
   "pipeline_version": "1.0.0",
   "overall": {
-    "hawk_score": 50.8,
+    "hawk_score": 52.0,
     "zone": "neutral",
     "zone_label": "Balanced",
     "verdict": "Economic indicators are broadly balanced",
-    "confidence": "HIGH"
+    "confidence": "LOW"
   },
   "gauges": {
     "inflation": {
@@ -178,6 +178,26 @@
       ],
       "data_source": "Cotality HVI",
       "stale_display": "quarter_only"
+    },
+    "business_confidence": {
+      "value": 72.5,
+      "zone": "warm",
+      "zone_label": "Mild hawkish pressure",
+      "z_score": 1.349,
+      "raw_value": 83.6,
+      "raw_unit": "%",
+      "weight": 0.05,
+      "polarity": 1,
+      "data_date": "2026-03-31",
+      "staleness_days": -35,
+      "confidence": "LOW",
+      "interpretation": "Capacity utilisation above long-run average",
+      "history": [
+        72.5
+      ],
+      "long_run_avg": 83.0,
+      "direction": "STEADY",
+      "data_source": "NAB Monthly Business Survey"
     }
   },
   "weights": {
@@ -198,10 +218,8 @@
     ],
     "mapping": "linear",
     "statistics": "robust (median/MAD)",
-    "indicators_available": 6,
-    "indicators_missing": [
-      "business_confidence"
-    ]
+    "indicators_available": 7,
+    "indicators_missing": []
   },
   "asx_futures": {
     "current_rate": 3.85,
