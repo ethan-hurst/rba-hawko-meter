@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** "Data, not opinion." Empowers laypeople to understand interest rate drivers without relying on media sensationalism or biased advice.
-**Current focus:** v2.0 Local CI & Test Infrastructure — Phase 13: Linting Baseline
+**Current focus:** v2.0 Local CI & Test Infrastructure — Phase 14: Live Verification
 
 ## Current Position
 
-Phase: 13 (Linting Baseline)
-Plan: 02 complete
-Status: Phase 13 complete
-Last activity: 2026-02-25 — Phase 13 complete (ruff + ESLint v10 baseline cleanup, zero violations, npm lint scripts)
+Phase: 14 (Live Verification)
+Plan: 01 complete
+Status: Phase 14 complete
+Last activity: 2026-02-25 — Phase 14 complete (9 live tests, verify summary script, npm scripts)
 
 ```
-v2.0 Progress: [██████    ] 60%
-Phase 11 [✓] Phase 12 [✓] Phase 13 [✓] Phase 14 [ ] Phase 15 [ ]
+v2.0 Progress: [████████  ] 80%
+Phase 11 [✓] Phase 12 [✓] Phase 13 [✓] Phase 14 [✓] Phase 15 [ ]
 ```
 
 ## Performance Metrics
@@ -77,6 +77,12 @@ Archived to PROJECT.md Key Decisions table. All v1.0 and v1.1 decisions preserve
 - max-len 88 for JS matching Python ruff convention for cross-language consistency
 - Catch params prefixed with _ (e.g. _e) for caughtErrorsIgnorePattern
 
+**v2.0 decisions (Plan 14-01):**
+- warnings.warn(UserWarning) for endpoint unavailability — not pytest.warns() — so tests pass whether endpoint is up or down
+- Shared _run_abs_test() helper for 5 ABS tests avoids duplication while keeping individual test functions
+- Staleness threshold 90 days — warns but does not fail
+- verify_summary.py checks only 7 gauge keys + hawk_score range — full JSON schema validation owned by test_schema.py
+
 ### Critical Context for v2.0
 
 - `DATA_DIR = Path("data")` in `pipeline/config.py` is a relative path — all tests must patch this via autouse fixture or they silently read/write live CSV files
@@ -92,6 +98,6 @@ None active.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed Phase 13 (Linting Baseline) — both plans verified clean
-Resume file: .planning/phases/13-linting-baseline/13-02-SUMMARY.md
-Next action: Proceed to Phase 14 (Live Verification)
+Stopped at: Completed Phase 14 (Live Verification) — 9 live tests + verify summary + npm scripts
+Resume file: .planning/phases/14-live-verification/14-01-SUMMARY.md
+Next action: Proceed to Phase 15 (Pre-Push Hook)

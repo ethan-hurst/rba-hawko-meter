@@ -32,10 +32,10 @@ Requirements for v2.0 Local CI & Test Infrastructure. Each maps to roadmap phase
 
 ### Live Verification
 
-- [ ] **LIVE-01**: Developer can verify ABS, RBA, ASX API ingestion works with real endpoints
-- [ ] **LIVE-02**: Developer can verify Cotality and NAB scrapers work against live pages
-- [ ] **LIVE-03**: Full pipeline run produces valid status.json with all indicators
-- [ ] **LIVE-04**: Live test failures are non-blocking warnings (graceful degradation preserved)
+- [x] **LIVE-01**: Developer can verify ABS, RBA, ASX API ingestion works with real endpoints
+- [x] **LIVE-02**: Developer can verify Cotality and NAB scrapers work against live pages
+- [x] **LIVE-03**: Full pipeline run produces valid status.json with all indicators
+- [x] **LIVE-04**: Live test failures are non-blocking warnings (graceful degradation preserved)
 
 ### Pre-Push Hook
 
@@ -83,10 +83,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LINT-02 | Phase 13 | Complete (13-01) |
 | LINT-03 | Phase 13 | Complete (13-02) |
 | LINT-04 | Phase 13 | Complete (13-02) |
-| LIVE-01 | Phase 14 | Pending |
-| LIVE-02 | Phase 14 | Pending |
-| LIVE-03 | Phase 14 | Pending |
-| LIVE-04 | Phase 14 | Pending |
+| LIVE-01 | Phase 14 | Complete |
+| LIVE-02 | Phase 14 | Complete |
+| LIVE-03 | Phase 14 | Complete |
+| LIVE-04 | Phase 14 | Complete |
 | HOOK-01 | Phase 15 | Pending |
 | HOOK-02 | Phase 15 | Pending |
 | HOOK-03 | Phase 15 | Pending |
