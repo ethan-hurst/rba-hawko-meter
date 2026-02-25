@@ -240,3 +240,4 @@ CONFIDENCE_MEDIUM_MIN_OBS = 20  # 5 years quarterly
 # Output paths
 WEIGHTS_FILE = DATA_DIR / "weights.json"
 STATUS_OUTPUT = Path("public") / "data" / "status.json"
+SNAPSHOTS_DIR = Path("public") / "data" / "snapshots"

@@ -16,11 +16,17 @@ import pipeline.config
 from pipeline.config import (
     INDICATOR_CONFIG,
     OPTIONAL_INDICATOR_CONFIG,
+    SNAPSHOTS_DIR,
     STATUS_OUTPUT,
     WEIGHTS_FILE,
     ZSCORE_CLAMP_MAX,
     ZSCORE_CLAMP_MIN,
     ZSCORE_WINDOW_YEARS,
+)
+from pipeline.normalize.archive import (
+    inject_deltas,
+    read_previous_snapshot,
+    save_snapshot,
 )
 from pipeline.normalize.gauge import (
     apply_polarity,
@@ -413,6 +419,15 @@ def generate_status():
               f"direction={asx_entry['direction']}, "
               f"P(cut)={asx_entry['probabilities']['cut']:.0f}%")
 
+    # Phase 24: Snapshot archival and delta injection
+    try:
+        save_snapshot(status, SNAPSHOTS_DIR)
+        previous = read_previous_snapshot(SNAPSHOTS_DIR)
+        inject_deltas(status, previous)
+    except Exception as e:
+        print(f"\n  WARNING: Snapshot archival failed: {e}")
+        # Non-fatal — pipeline still writes status.json without deltas
+
     # Write to output file
     STATUS_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with open(STATUS_OUTPUT, 'w') as f:
@@ -421,6 +436,13 @@ def generate_status():
     print(f"\n  Hawk Score: {hawk_score:.1f} ({overall_zone_label})")
     print(f"  Indicators: {len(gauges)} available, {len(missing_indicators)} missing")
     print(f"  Output: {STATUS_OUTPUT}")
+
+    if 'previous_hawk_score' in status.get('overall', {}):
+        prev = status['overall']['previous_hawk_score']
+        delta = status['overall']['hawk_score_delta']
+        print(f"  Previous score: {prev:.1f}, Delta: {delta:+.1f}")
+    else:
+        print("  Delta: N/A (no prior snapshot)")
 
     return status
 
