@@ -42,7 +42,7 @@ Delivered: Test foundation (pyproject.toml + isolated fixtures), 60+ pytest unit
 
 - [x] **Phase 18: Test Infrastructure** — Wire pytest-cov into addopts, add pytest-mock and responses deps, create scraper fixture files, and write the per-module coverage check script (completed 2026-02-25)
 - [x] **Phase 19: Ingest Module Tests** — Unit tests for all 6 ingest/utility modules (abs_data, rba_data, asx_futures_scraper, corelogic_scraper, nab_scraper, http_client) reaching 85%+ each (completed 2026-02-25)
-- [ ] **Phase 20: Orchestration Tests and Enforcement** — Unit tests for engine.py and main.py at 85%+, coverage check wired into npm scripts and pre-push hook
+- [x] **Phase 20: Orchestration Tests and Enforcement** — Unit tests for engine.py and main.py at 85%+, coverage check wired into npm scripts and pre-push hook (completed 2026-02-25)
 
 ## Phase Details
 
@@ -109,4 +109,4 @@ Plans:
 | 17. Fix DATA_DIR & Verify Chain | v2.0 | 2/2 | Complete | 2026-02-25 |
 | 18. Test Infrastructure | 2/2 | Complete    | 2026-02-25 | - |
 | 19. Ingest Module Tests | v3.0 | Complete    | 2026-02-25 | - |
-| 20. Orchestration Tests and Enforcement | v3.0 | 0/2 | Not started | - |
+| 20. Orchestration Tests and Enforcement | v3.0 | Complete    | 2026-02-25 | - |

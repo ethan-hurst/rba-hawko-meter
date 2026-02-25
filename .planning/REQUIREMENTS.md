@@ -25,13 +25,13 @@ Requirements for 85%+ per-module test coverage across all pipeline/ modules.
 
 ### Orchestration Tests
 
-- [ ] **ORCH-01**: engine.py unit tests covering normalization pipeline, gauge entry building, and status generation at 85%+
-- [ ] **ORCH-02**: main.py unit tests covering pipeline orchestration, partial failure, and critical failure paths at 85%+
+- [x] **ORCH-01**: engine.py unit tests covering normalization pipeline, gauge entry building, and status generation at 85%+
+- [x] **ORCH-02**: main.py unit tests covering pipeline orchestration, partial failure, and critical failure paths at 85%+
 
 ### Coverage Enforcement
 
-- [ ] **ENFORCE-01**: Per-module 85% coverage check integrated into npm test scripts
-- [ ] **ENFORCE-02**: Coverage check wired into pre-push hook or test:fast command
+- [x] **ENFORCE-01**: Per-module 85% coverage check integrated into npm test scripts
+- [x] **ENFORCE-02**: Coverage check wired into pre-push hook or test:fast command
 
 ## Future Requirements
 
@@ -62,16 +62,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-02 | Phase 18 | Complete |
 | INFRA-03 | Phase 18 | Complete |
 | INFRA-04 | Phase 18 | Complete |
-| INGEST-01 | Phase 19 | Pending |
-| INGEST-02 | Phase 19 | Pending |
-| INGEST-03 | Phase 19 | Pending |
-| INGEST-04 | Phase 19 | Pending |
-| INGEST-05 | Phase 19 | Pending |
-| INGEST-06 | Phase 19 | Pending |
-| ORCH-01 | Phase 20 | Pending |
-| ORCH-02 | Phase 20 | Pending |
-| ENFORCE-01 | Phase 20 | Pending |
-| ENFORCE-02 | Phase 20 | Pending |
+| INGEST-01 | Phase 19 | Complete |
+| INGEST-02 | Phase 19 | Complete |
+| INGEST-03 | Phase 19 | Complete |
+| INGEST-04 | Phase 19 | Complete |
+| INGEST-05 | Phase 19 | Complete |
+| INGEST-06 | Phase 19 | Complete |
+| ORCH-01 | Phase 20 | Complete |
+| ORCH-02 | Phase 20 | Complete |
+| ENFORCE-01 | Phase 20 | Complete |
+| ENFORCE-02 | Phase 20 | Complete |
 
 **Coverage:**
 - v3.0 requirements: 14 total
