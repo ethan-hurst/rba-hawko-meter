@@ -38,8 +38,9 @@ test.describe('Phase 6 — UX & Plain English Overhaul', () => {
     const svg = heroPlot.locator('svg.main-svg');
     await expect(svg.first()).toBeVisible({ timeout: 15000 });
 
-    // Current score falls in a zone — stance label should match
-    await expect(heroPlot).toContainText(expectedStance);
+    // Stance label now in verdict container (Phase 23: Plotly title removed)
+    const verdict = page.locator('#verdict-container');
+    await expect(verdict).toContainText(expectedStance);
 
     // Verify NO occurrence of old jargon terms anywhere on the page
     const bodyText = await page.locator('body').textContent();

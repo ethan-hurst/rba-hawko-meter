@@ -33,8 +33,9 @@ test.describe('Phase 4 — Hawk-O-Meter Gauges', () => {
     // Hawk score should be visible as "<score>/100" (derived from status.json)
     await expect(heroPlot).toContainText(`${hawkScore}/100`);
 
-    // Stance label should match the zone for the current score
-    await expect(heroPlot).toContainText(expectedStance);
+    // Stance label now in verdict container (Phase 23: Plotly title removed)
+    const verdict = page.locator('#verdict-container');
+    await expect(verdict).toContainText(expectedStance);
   });
 
   test('2. Individual metric cards render with interpretations', async ({ page }) => {
