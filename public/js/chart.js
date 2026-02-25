@@ -1,5 +1,6 @@
 /**
- * ChartModule - Plotly.js chart with dark theme, timeframe toggles, and rate change annotations.
+ * ChartModule - Plotly.js chart with dark theme,
+ * timeframe toggles, and rate change annotations.
  * Uses safe DOM methods throughout.
  */
 var ChartModule = (function () {

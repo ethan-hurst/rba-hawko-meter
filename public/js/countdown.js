@@ -28,7 +28,9 @@ var CountdownModule = (function () {
   /**
    * Calculate time remaining until target date.
    * @param {Date} targetDate
-   * @returns {{days: number, hours: number, minutes: number, seconds: number, isPast: boolean, isToday: boolean}}
+   * @returns {{days: number, hours: number,
+   *   minutes: number, seconds: number,
+   *   isPast: boolean, isToday: boolean}}
    */
   function calculateTimeRemaining(targetDate) {
     var now = new Date();
@@ -87,7 +89,7 @@ var CountdownModule = (function () {
   /**
    * Update the countdown display using safe DOM methods.
    * @param {HTMLElement} containerEl
-   * @param {{days: number, hours: number, minutes: number, seconds: number, isPast: boolean, isToday: boolean}} time
+   * @param {Object} time - Time remaining object
    * @param {Object} meetingData
    */
   function updateDisplay(containerEl, time, meetingData) {
@@ -98,11 +100,16 @@ var CountdownModule = (function () {
     if (time.isToday) {
       // Meeting day banner
       var bannerDiv = document.createElement('div');
-      bannerDiv.className = 'bg-gauge-amber/10 border border-gauge-amber/30 rounded-lg px-6 py-4 text-center';
+      bannerDiv.className =
+        'bg-gauge-amber/10 border '
+        + 'border-gauge-amber/30 rounded-lg '
+        + 'px-6 py-4 text-center';
 
       var bannerText = document.createElement('p');
       bannerText.className = 'text-gauge-amber font-bold text-lg';
-      bannerText.textContent = 'RBA Board meeting TODAY \u2014 decision expected 2:30pm AEST';
+      bannerText.textContent =
+        'RBA Board meeting TODAY \u2014 '
+        + 'decision expected 2:30pm AEST';
 
       bannerDiv.appendChild(bannerText);
       containerEl.appendChild(bannerDiv);
@@ -133,7 +140,10 @@ var CountdownModule = (function () {
 
     var dateDisplay = document.createElement('p');
     dateDisplay.className = 'text-sm text-gray-400 mb-4';
-    dateDisplay.textContent = meetingData.next_meeting.display_date + ', ' + meetingData.next_meeting.display_time;
+    dateDisplay.textContent =
+      meetingData.next_meeting.display_date
+      + ', '
+      + meetingData.next_meeting.display_time;
 
     var timerDiv = document.createElement('div');
     timerDiv.className = 'flex items-center justify-center gap-3 sm:gap-4';

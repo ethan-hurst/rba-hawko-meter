@@ -1,7 +1,8 @@
 /**
  * Gauge initialization orchestrator.
  * Fetches status.json and renders hero gauge, ASX table, verdict, and metric gauges.
- * Uses DataModule for fetch/cache/error, GaugesModule for rendering, InterpretationsModule for text.
+ * Uses DataModule for fetch/cache/error, GaugesModule for
+ * rendering, InterpretationsModule for text.
  */
 (function () {
   'use strict';
@@ -30,7 +31,9 @@
       var weight = weightsObj[indicatorId] || 0;
 
       var card = document.createElement('div');
-      card.className = 'bg-finance-gray/50 rounded-lg p-4 border border-finance-border/50 opacity-60';
+      card.className =
+        'bg-finance-gray/50 rounded-lg p-4'
+        + ' border border-finance-border/50 opacity-60';
 
       // Header row: label + weight badge
       var header = document.createElement('div');
@@ -102,7 +105,9 @@
       var total = 8;
       var available = orderedIds.length;
       if (available < total) {
-        coverageEl.textContent = 'Based on ' + available + ' of ' + total + ' indicators (more data coming soon)';
+        coverageEl.textContent =
+          'Based on ' + available + ' of ' + total
+          + ' indicators (more data coming soon)';
       } else {
         coverageEl.textContent = '';
       }
@@ -133,7 +138,7 @@
    * @param {number} score - Overall hawk score (0-100)
    * @param {string} zoneLabel - Zone label from status.json
    */
-  function renderCalculatorBridge(score, zoneLabel) {
+  function renderCalculatorBridge(score, _zoneLabel) {
     var calcSection = document.getElementById('calculator-section');
     if (!calcSection) return;
 
@@ -142,7 +147,9 @@
     if (!bridgeDiv) {
       bridgeDiv = document.createElement('div');
       bridgeDiv.id = 'calculator-bridge';
-      bridgeDiv.className = 'mb-4 p-4 bg-finance-gray border border-finance-border rounded-lg';
+      bridgeDiv.className =
+        'mb-4 p-4 bg-finance-gray'
+        + ' border border-finance-border rounded-lg';
       // Insert before the first child (the h2 heading)
       calcSection.insertBefore(bridgeDiv, calcSection.firstChild);
     }
@@ -155,7 +162,12 @@
     // Convert zone label to plain English, lowercase
     var plainLabel = GaugesModule.getStanceLabel(score).toLowerCase();
 
-    para.textContent = 'The Hawk-O-Meter reads ' + Math.round(score) + '/100 (' + plainLabel + '). Here\u2019s what current and potential rate changes could mean for a typical mortgage.';
+    para.textContent =
+      'The Hawk-O-Meter reads '
+      + Math.round(score) + '/100 (' + plainLabel
+      + '). Here\u2019s what current and potential'
+      + ' rate changes could mean for a typical'
+      + ' mortgage.';
 
     bridgeDiv.appendChild(para);
   }
@@ -179,16 +191,24 @@
         if (jumpContainer) {
           var jumpLink = document.createElement('a');
           jumpLink.href = '#calculator-section';
-          jumpLink.className = 'inline-block text-sm text-finance-accent hover:underline mt-1';
-          jumpLink.textContent = 'See what this means for your mortgage \u2193';
+          jumpLink.className =
+            'inline-block text-sm'
+            + ' text-finance-accent hover:underline mt-1';
+          jumpLink.textContent =
+            'See what this means for your mortgage \u2193';
           jumpContainer.appendChild(jumpLink);
         }
 
         // Render ASX table (currently missing from data, will show unavailable)
-        InterpretationsModule.renderASXTable('asx-futures-container', data.asx_futures || null);
+        InterpretationsModule.renderASXTable(
+          'asx-futures-container',
+          data.asx_futures || null
+        );
 
         // Render data freshness
-        InterpretationsModule.renderStalenessWarning('data-freshness', data.generated_at);
+        InterpretationsModule.renderStalenessWarning(
+          'data-freshness', data.generated_at
+        );
 
         // Render individual metric gauges
         renderMetricGauges(data.gauges);
@@ -197,7 +217,11 @@
         if (data.metadata && Array.isArray(data.metadata.indicators_missing)) {
           var gridContainer = document.getElementById('metric-gauges-grid');
           if (gridContainer) {
-            renderMissingIndicatorCards(gridContainer, data.metadata.indicators_missing, data.weights || {});
+            renderMissingIndicatorCards(
+              gridContainer,
+              data.metadata.indicators_missing,
+              data.weights || {}
+            );
           }
         }
 
@@ -206,7 +230,11 @@
       })
       .catch(function (err) {
         console.error('Gauge initialization failed:', err);
-        DataModule.showError('hero-gauge-plot', 'Unable to load economic data. Please refresh the page.');
+        DataModule.showError(
+          'hero-gauge-plot',
+          'Unable to load economic data.'
+          + ' Please refresh the page.'
+        );
       });
   }
 

@@ -1,6 +1,7 @@
 /**
  * GaugesModule - Plotly gauge rendering for Hawk-O-Meter.
- * Creates hero and metric semicircle needle gauges with 5-zone Blue/Grey/Red color scheme.
+ * Creates hero and metric semicircle needle gauges
+ * with 5-zone Blue/Grey/Red color scheme.
  * Uses safe DOM methods throughout (no innerHTML).
  */
 var GaugesModule = (function () {

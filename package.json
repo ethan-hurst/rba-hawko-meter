@@ -5,9 +5,15 @@
   "description": "RBA Hawk-O-Meter — Interest Rate Dashboard",
   "scripts": {
     "test": "npx playwright test",
-    "test:headed": "npx playwright test --headed"
+    "test:headed": "npx playwright test --headed",
+    "lint:py": "ruff check pipeline/ tests/",
+    "lint:js": "eslint public/js/",
+    "lint": "npm run lint:py && npm run lint:js"
   },
   "devDependencies": {
-    "@playwright/test": "^1.50.0"
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.50.0",
+    "eslint": "^10.0.2",
+    "globals": "^17.3.0"
   }
 }

@@ -31,7 +31,9 @@
       footerUpdatedEl.textContent = updatedText;
     }
     if (chartSourceEl) {
-      chartSourceEl.textContent = 'Source: Reserve Bank of Australia | Updated ' + rateData.last_updated;
+      chartSourceEl.textContent =
+        'Source: Reserve Bank of Australia | Updated '
+        + rateData.last_updated;
     }
   }
 
@@ -48,7 +50,10 @@
     }
     if (updatedEl) {
       updatedEl.textContent = 'Unable to load rate data';
-      updatedEl.className = updatedEl.className.replace('text-gray-500', 'text-red-400');
+      updatedEl.className =
+        updatedEl.className.replace(
+          'text-gray-500', 'text-red-400'
+        );
     }
   }
 
@@ -100,7 +105,11 @@
       console.error('Calculator initialization failed:', error);
       var calcSection = document.getElementById('calculator-section');
       if (calcSection) {
-        DataModule.showError('calc-results', 'Calculator failed to load. Please refresh the page.');
+        DataModule.showError(
+          'calc-results',
+          'Calculator failed to load. '
+          + 'Please refresh the page.'
+        );
       }
     }
   }
@@ -133,7 +142,11 @@
         setupResizeHandler();
       } else {
         showCashRateError();
-        DataModule.showError('rate-chart', 'Failed to load rate data. Please refresh the page.');
+        DataModule.showError(
+          'rate-chart',
+          'Failed to load rate data. '
+          + 'Please refresh the page.'
+        );
       }
 
       // Handle meetings data

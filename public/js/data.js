@@ -44,7 +44,9 @@ var DataModule = (function () {
     }
 
     var errorDiv = document.createElement('div');
-    errorDiv.className = 'bg-red-900/20 border border-red-500/50 text-red-200 px-6 py-4 rounded-lg';
+    errorDiv.className =
+      'bg-red-900/20 border border-red-500/50 '
+      + 'text-red-200 px-6 py-4 rounded-lg';
 
     var titleP = document.createElement('p');
     titleP.className = 'font-semibold mb-1';

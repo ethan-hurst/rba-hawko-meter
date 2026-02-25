@@ -13,12 +13,6 @@ var InterpretationsModule = (function () {
     'Strong hawkish pressure': 'RATES LIKELY RISING'
   };
 
-  var percentFormatter = new Intl.NumberFormat('en-AU', {
-    style: 'percent',
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1
-  });
-
   var ausDateFormatter = new Intl.DateTimeFormat('en-AU', {
     day: 'numeric', month: 'short', year: 'numeric'
   });
@@ -67,7 +61,9 @@ var InterpretationsModule = (function () {
       return;
     }
 
-    var stance = ZONE_LABEL_MAP[overallData.zone_label] || overallData.zone_label || 'NEUTRAL';
+    var stance =
+      ZONE_LABEL_MAP[overallData.zone_label]
+      || overallData.zone_label || 'NEUTRAL';
 
     var labelSpan = document.createElement('span');
     labelSpan.className = 'font-bold';
@@ -153,7 +149,9 @@ var InterpretationsModule = (function () {
     if (asxData.current_rate != null) {
       var currentRate = document.createElement('p');
       currentRate.className = 'text-xs text-gray-400 mb-3';
-      currentRate.textContent = 'Current cash rate: ' + asxData.current_rate.toFixed(2) + '%';
+      currentRate.textContent =
+        'Current cash rate: '
+        + asxData.current_rate.toFixed(2) + '%';
       container.appendChild(currentRate);
     }
 
@@ -244,13 +242,22 @@ var InterpretationsModule = (function () {
       // Percentage labels below bar
       var labelParts = [];
       if (probCut > 0) {
-        labelParts.push({ text: Math.round(probCut) + '% cut', color: TRAFFIC_COLORS.cut });
+        labelParts.push({
+          text: Math.round(probCut) + '% cut',
+          color: TRAFFIC_COLORS.cut
+        });
       }
       if (probHold > 0) {
-        labelParts.push({ text: Math.round(probHold) + '% hold', color: TRAFFIC_COLORS.hold });
+        labelParts.push({
+          text: Math.round(probHold) + '% hold',
+          color: TRAFFIC_COLORS.hold
+        });
       }
       if (probHike > 0) {
-        labelParts.push({ text: Math.round(probHike) + '% hike', color: TRAFFIC_COLORS.hike });
+        labelParts.push({
+          text: Math.round(probHike) + '% hike',
+          color: TRAFFIC_COLORS.hike
+        });
       }
 
       var labelP = document.createElement('p');
@@ -335,10 +342,14 @@ var InterpretationsModule = (function () {
 
     if (diffDays > 7) {
       span.className = 'text-amber-400';
-      span.textContent = 'Data is ' + diffDays + ' days old \u2014 update may be overdue';
+      span.textContent =
+        'Data is ' + diffDays
+        + ' days old \u2014 update may be overdue';
     } else {
       span.className = 'text-gray-500';
-      span.textContent = 'Updated ' + diffDays + ' day' + (diffDays !== 1 ? 's' : '') + ' ago';
+      span.textContent =
+        'Updated ' + diffDays + ' day'
+        + (diffDays !== 1 ? 's' : '') + ' ago';
     }
 
     container.appendChild(span);
@@ -360,7 +371,9 @@ var InterpretationsModule = (function () {
   /**
    * Generate data-driven interpretation text for a metric.
    * @param {string} metricId - Metric identifier (e.g. 'inflation')
-   * @param {Object} metricData - { value, z_score, raw_value, raw_unit, data_date, staleness_days, confidence, interpretation }
+   * @param {Object} metricData - { value, z_score,
+   *   raw_value, raw_unit, data_date, staleness_days,
+   *   confidence, interpretation }
    * @returns {string} Plain text interpretation
    */
   function generateMetricInterpretation(metricId, metricData) {
@@ -370,23 +383,50 @@ var InterpretationsModule = (function () {
     }
 
     var v = metricData.value;
-    var raw = metricData.raw_value != null ? parseFloat(metricData.raw_value).toFixed(1) : '?';
+    var raw = metricData.raw_value != null
+      ? parseFloat(metricData.raw_value).toFixed(1)
+      : '?';
 
     switch (metricId) {
       case 'inflation':
-        if (v < 40) return 'Prices up ' + raw + '% over the past year \u2014 within the RBA\'s 2\u20133% target';
-        if (v <= 60) return 'Prices up ' + raw + '% over the past year \u2014 near the top of the RBA\'s 2\u20133% target';
-        return 'Prices up ' + raw + '% over the past year \u2014 above the RBA\'s 2\u20133% target';
+        if (v < 40) {
+          return 'Prices up ' + raw
+            + '% over the past year'
+            + ' \u2014 within the RBA\'s 2\u20133% target';
+        }
+        if (v <= 60) {
+          return 'Prices up ' + raw
+            + '% over the past year \u2014 near'
+            + ' the top of the RBA\'s 2\u20133% target';
+        }
+        return 'Prices up ' + raw
+          + '% over the past year'
+          + ' \u2014 above the RBA\'s 2\u20133% target';
 
       case 'wages':
-        if (v < 40) return 'Wages up ' + raw + '% over the past year \u2014 growing slowly';
-        if (v <= 60) return 'Wages up ' + raw + '% over the past year \u2014 moderate growth';
-        return 'Wages up ' + raw + '% over the past year \u2014 growing fast, which can push up prices';
+        if (v < 40) {
+          return 'Wages up ' + raw
+            + '% over the past year \u2014 growing slowly';
+        }
+        if (v <= 60) {
+          return 'Wages up ' + raw
+            + '% over the past year \u2014 moderate growth';
+        }
+        return 'Wages up ' + raw
+          + '% over the past year'
+          + ' \u2014 growing fast, which can push up prices';
 
       case 'building_approvals':
-        if (v < 40) return 'New building approvals are below average \u2014 a sign of slowing construction';
-        if (v <= 60) return 'New building approvals are near average levels';
-        return 'New building approvals are above average \u2014 a sign of strong construction demand';
+        if (v < 40) {
+          return 'New building approvals are below average'
+            + ' \u2014 a sign of slowing construction';
+        }
+        if (v <= 60) {
+          return 'New building approvals'
+            + ' are near average levels';
+        }
+        return 'New building approvals are above average'
+          + ' \u2014 a sign of strong construction demand';
 
       case 'housing':
         var direction, sign;
@@ -403,17 +443,33 @@ var InterpretationsModule = (function () {
           sign = '';
         }
         var quarterLabel = toQuarterLabel(metricData.data_date);
-        return direction + ' ' + sign + raw + '% year-on-year ' + quarterLabel;
+        return direction + ' ' + sign + raw
+          + '% year-on-year ' + quarterLabel;
 
       case 'employment':
-        if (v < 40) return 'The job market is softening \u2014 fewer new jobs being created';
-        if (v <= 60) return 'The job market is steady \u2014 balanced conditions';
-        return 'The job market is very tight \u2014 lots of demand for workers, which can push up wages';
+        if (v < 40) {
+          return 'The job market is softening'
+            + ' \u2014 fewer new jobs being created';
+        }
+        if (v <= 60) {
+          return 'The job market is steady'
+            + ' \u2014 balanced conditions';
+        }
+        return 'The job market is very tight'
+          + ' \u2014 lots of demand for workers,'
+          + ' which can push up wages';
 
       case 'spending':
-        if (v < 40) return 'Consumer spending is subdued \u2014 people are holding back';
-        if (v <= 60) return 'Consumer spending is at moderate levels';
-        return 'Consumer spending is strong \u2014 which can push up prices';
+        if (v < 40) {
+          return 'Consumer spending is subdued'
+            + ' \u2014 people are holding back';
+        }
+        if (v <= 60) {
+          return 'Consumer spending'
+            + ' is at moderate levels';
+        }
+        return 'Consumer spending is strong'
+          + ' \u2014 which can push up prices';
 
       case 'business_confidence':
         // Capacity utilisation: show level + direction + month label
@@ -431,10 +487,14 @@ var InterpretationsModule = (function () {
         var cuDate = new Date(metricData.data_date);
         var monthLabel = '';
         if (!isNaN(cuDate.getTime())) {
-          monthLabel = ' (' + cuDate.toLocaleString('en-AU', {month: 'short', year: 'numeric'}) + ')';
+          monthLabel = ' (' + cuDate.toLocaleString(
+            'en-AU',
+            {month: 'short', year: 'numeric'}
+          ) + ')';
         }
 
-        return cuVal.toFixed(1) + '% \u2014 ' + aboveBelow + ' avg' + dirText + monthLabel;
+        return cuVal.toFixed(1) + '% \u2014 '
+          + aboveBelow + ' avg' + dirText + monthLabel;
 
       default:
         return metricData.interpretation || GaugesModule.getDisplayLabel(metricId);
@@ -448,13 +508,29 @@ var InterpretationsModule = (function () {
    */
   function getWhyItMatters(metricId) {
     var reasons = {
-      inflation: 'When prices rise too fast, the RBA tends to raise interest rates to slow things down.',
-      wages: 'Rising wages can push up prices, which can lead the RBA to raise rates.',
-      building_approvals: 'Fewer approvals signals a slowing economy, which may support rate cuts.',
-      housing: 'Rapidly rising house prices can prompt the RBA to raise rates to cool the market.',
-      employment: 'Low unemployment means a strong economy, which can lead to rate rises.',
-      spending: 'When consumers spend more, it can push prices up and lead to rate rises.',
-      business_confidence: 'High capacity utilisation signals inflation pressure, making rate cuts less likely.'
+      inflation:
+        'When prices rise too fast, the RBA tends'
+        + ' to raise interest rates to slow things'
+        + ' down.',
+      wages:
+        'Rising wages can push up prices, which'
+        + ' can lead the RBA to raise rates.',
+      building_approvals:
+        'Fewer approvals signals a slowing economy,'
+        + ' which may support rate cuts.',
+      housing:
+        'Rapidly rising house prices can prompt'
+        + ' the RBA to raise rates to cool'
+        + ' the market.',
+      employment:
+        'Low unemployment means a strong economy,'
+        + ' which can lead to rate rises.',
+      spending:
+        'When consumers spend more, it can push'
+        + ' prices up and lead to rate rises.',
+      business_confidence:
+        'High capacity utilisation signals inflation'
+        + ' pressure, making rate cuts less likely.'
     };
     return reasons[metricId] || null;
   }
@@ -466,22 +542,32 @@ var InterpretationsModule = (function () {
    */
   function getPlainVerdict(score) {
     if (score < 20) {
-      return 'The economy is showing significant signs of slowing. Interest rates are more likely to come down.';
+      return 'The economy is showing significant'
+        + ' signs of slowing. Interest rates are'
+        + ' more likely to come down.';
     }
     if (score < 40) {
-      return 'The economy is showing some signs of easing. Interest rates may be more likely to fall than rise.';
+      return 'The economy is showing some signs'
+        + ' of easing. Interest rates may be more'
+        + ' likely to fall than rise.';
     }
     if (score <= 60) {
-      return 'The economy is giving mixed signals. Interest rates are likely to stay where they are for now.';
+      return 'The economy is giving mixed signals.'
+        + ' Interest rates are likely to stay where'
+        + ' they are for now.';
     }
     if (score <= 80) {
-      return 'The economy is running warm. Interest rates may be more likely to rise than fall.';
+      return 'The economy is running warm.'
+        + ' Interest rates may be more likely'
+        + ' to rise than fall.';
     }
-    return 'The economy is running hot. Interest rates are more likely to go up.';
+    return 'The economy is running hot.'
+      + ' Interest rates are more likely to go up.';
   }
 
   /**
-   * Render a complete metric card with gauge container, interpretation, weight, and source.
+   * Render a complete metric card with gauge container,
+   * interpretation, weight, and source.
    * @param {string} containerId - Parent container DOM element ID
    * @param {string} metricId - Metric identifier
    * @param {Object} metricData - Gauge data from status.json
@@ -583,7 +669,9 @@ var InterpretationsModule = (function () {
       var months = Math.round(metricData.staleness_days / 30);
       var staleNote = document.createElement('span');
       staleNote.className = 'text-amber-400 ml-2';
-      staleNote.textContent = '(' + months + ' month' + (months !== 1 ? 's' : '') + ' old \u2014 newer data not yet available)';
+      staleNote.textContent = '(' + months + ' month'
+        + (months !== 1 ? 's' : '')
+        + ' old \u2014 newer data not yet available)';
       sourceDiv.appendChild(staleNote);
     }
     card.appendChild(sourceDiv);

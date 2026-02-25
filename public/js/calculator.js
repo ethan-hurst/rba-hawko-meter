@@ -68,7 +68,8 @@ var CalculatorModule = (function () {
    * Calculate per-period payment for given inputs and rate.
    * Dispatches to PI or IO formula, then adjusts for frequency.
    * @param {Object} inputs - Calculator inputs
-   * @param {number} [rateOverride] - Optional rate to use instead of inputs.interestRate
+   * @param {number} [rateOverride] - Optional rate to use
+   *   instead of inputs.interestRate
    * @returns {Decimal} Per-period payment
    */
   function calculatePayment(inputs, rateOverride) {
@@ -96,7 +97,9 @@ var CalculatorModule = (function () {
 
     var currentPerPeriod = calculatePayment(inputs);
     var scenarioPerPeriod = calculatePayment(inputs, scenarioRate);
-    var quarterPointRate = new Decimal(inputs.interestRate.toString()).plus('0.25').toNumber();
+    var quarterPointRate = new Decimal(
+      inputs.interestRate.toString()
+    ).plus('0.25').toNumber();
     var quarterPointPerPeriod = calculatePayment(inputs, quarterPointRate);
 
     var currentAnnual = currentPerPeriod.times(freq.perYear);
@@ -131,7 +134,11 @@ var CalculatorModule = (function () {
   // ---------------------------------------------------------------------------
 
   var currencyFormatter = typeof Intl !== 'undefined'
-    ? new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 })
+    ? new Intl.NumberFormat('en-AU', {
+      style: 'currency',
+      currency: 'AUD',
+      minimumFractionDigits: 2
+    })
     : null;
 
   /**
@@ -177,11 +184,20 @@ var CalculatorModule = (function () {
   function isValidInputs(data) {
     if (data === null || typeof data !== 'object') return false;
 
-    if (typeof data.loanAmount !== 'number' || data.loanAmount < 1000 || data.loanAmount > 10000000) return false;
-    if (typeof data.termYears !== 'number' || data.termYears < 1 || data.termYears > 30) return false;
-    if (typeof data.interestRate !== 'number' || data.interestRate < 0.01 || data.interestRate > 15) return false;
-    if (data.repaymentType !== 'PI' && data.repaymentType !== 'IO') return false;
-    if (data.frequency !== 'monthly' && data.frequency !== 'fortnightly' && data.frequency !== 'weekly') return false;
+    if (typeof data.loanAmount !== 'number'
+      || data.loanAmount < 1000
+      || data.loanAmount > 10000000) return false;
+    if (typeof data.termYears !== 'number'
+      || data.termYears < 1
+      || data.termYears > 30) return false;
+    if (typeof data.interestRate !== 'number'
+      || data.interestRate < 0.01
+      || data.interestRate > 15) return false;
+    if (data.repaymentType !== 'PI'
+      && data.repaymentType !== 'IO') return false;
+    if (data.frequency !== 'monthly'
+      && data.frequency !== 'fortnightly'
+      && data.frequency !== 'weekly') return false;
 
     return true;
   }
@@ -196,8 +212,8 @@ var CalculatorModule = (function () {
       if (item === null) return assign({}, DEFAULTS);
       var parsed = JSON.parse(item);
       return isValidInputs(parsed) ? parsed : assign({}, DEFAULTS);
-    } catch (e) {
-      try { localStorage.removeItem(STORAGE_KEY); } catch (_) { /* ignore */ }
+    } catch (_e) {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (_e2) { /* ignore */ }
       return assign({}, DEFAULTS);
     }
   }
@@ -212,7 +228,7 @@ var CalculatorModule = (function () {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(inputs));
       return true;
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
   }
@@ -291,11 +307,19 @@ var CalculatorModule = (function () {
     var freqEl = document.getElementById('calc-frequency');
 
     return {
-      loanAmount: loanEl ? parseFloat(loanEl.value) || DEFAULTS.loanAmount : DEFAULTS.loanAmount,
-      termYears: termEl ? parseInt(termEl.value, 10) || DEFAULTS.termYears : DEFAULTS.termYears,
-      interestRate: rateEl ? parseFloat(rateEl.value) || DEFAULTS.interestRate : DEFAULTS.interestRate,
-      repaymentType: typeEl ? typeEl.value : DEFAULTS.repaymentType,
-      frequency: freqEl ? freqEl.value : DEFAULTS.frequency
+      loanAmount: loanEl
+        ? parseFloat(loanEl.value) || DEFAULTS.loanAmount
+        : DEFAULTS.loanAmount,
+      termYears: termEl
+        ? parseInt(termEl.value, 10) || DEFAULTS.termYears
+        : DEFAULTS.termYears,
+      interestRate: rateEl
+        ? parseFloat(rateEl.value) || DEFAULTS.interestRate
+        : DEFAULTS.interestRate,
+      repaymentType: typeEl
+        ? typeEl.value : DEFAULTS.repaymentType,
+      frequency: freqEl
+        ? freqEl.value : DEFAULTS.frequency
     };
   }
 
@@ -339,8 +363,16 @@ var CalculatorModule = (function () {
     var perPeriodDiff = formatDifference(comparison.diff.perPeriod);
     var annualDiff = formatDifference(comparison.diff.annual);
 
-    setDiffText('calc-diff-per-period', perPeriodDiff.text + ' ' + freq.label, perPeriodDiff.className);
-    setDiffText('calc-diff-annual', annualDiff.text + ' per year', annualDiff.className);
+    setDiffText(
+      'calc-diff-per-period',
+      perPeriodDiff.text + ' ' + freq.label,
+      perPeriodDiff.className
+    );
+    setDiffText(
+      'calc-diff-annual',
+      annualDiff.text + ' per year',
+      annualDiff.className
+    );
 
     // Comparison table
     updateComparisonTable(comparison, freq);
@@ -363,7 +395,11 @@ var CalculatorModule = (function () {
     var rows = [
       { label: 'Current Rate', data: comparison.current, isCurrent: true },
       { label: 'Scenario Rate', data: comparison.scenario, isCurrent: false },
-      { label: '+0.25% (Standard RBA Move)', data: comparison.quarterPoint, isCurrent: false }
+      {
+        label: '+0.25% (Standard RBA Move)',
+        data: comparison.quarterPoint,
+        isCurrent: false
+      }
     ];
 
     for (var i = 0; i < rows.length; i++) {
@@ -378,7 +414,9 @@ var CalculatorModule = (function () {
       tdRate.textContent = row.data.rate + '%';
       if (row.isCurrent) {
         var badge = document.createElement('span');
-        badge.className = 'ml-2 text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300';
+        badge.className =
+          'ml-2 text-xs px-1.5 py-0.5'
+          + ' rounded bg-blue-500/20 text-blue-300';
         badge.textContent = 'current';
         tdRate.appendChild(badge);
       }
@@ -400,7 +438,8 @@ var CalculatorModule = (function () {
         tdDiff.textContent = '--';
         tdDiff.className += ' text-gray-500';
       } else {
-        var diffVal = new Decimal(row.data.annual).minus(new Decimal(comparison.current.annual));
+        var diffVal = new Decimal(row.data.annual)
+          .minus(new Decimal(comparison.current.annual));
         var diffFormatted = formatDifference(diffVal.toFixed(2));
         tdDiff.textContent = diffFormatted.text + '/yr';
         tdDiff.className += ' ' + diffFormatted.className;
@@ -546,7 +585,9 @@ var CalculatorModule = (function () {
       if (calcResults) {
         var errMsg = document.createElement('p');
         errMsg.className = 'text-red-400 text-sm';
-        errMsg.textContent = 'Calculator requires Decimal.js library. Please refresh the page.';
+        errMsg.textContent =
+          'Calculator requires Decimal.js library.'
+          + ' Please refresh the page.';
         calcResults.appendChild(errMsg);
       }
       return false;
