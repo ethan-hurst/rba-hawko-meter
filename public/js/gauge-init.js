@@ -180,9 +180,20 @@
 
     DataModule.fetch('data/status.json')
       .then(function (data) {
+        // Check reduced motion once for all animations (Phase 23)
+        var reducedMotion = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+
         // Render hero gauge wrapped in rAF to prevent zero-width after DOM restructure
         requestAnimationFrame(function () {
-          GaugesModule.createHeroGauge('hero-gauge-plot', data.overall.hawk_score);
+          if (reducedMotion) {
+            GaugesModule.createHeroGauge('hero-gauge-plot', data.overall.hawk_score);
+          } else {
+            GaugesModule.createHeroGaugeAnimated(
+              'hero-gauge-plot', data.overall.hawk_score
+            );
+          }
           // Second rAF for resize after paint
           requestAnimationFrame(function () {
             var heroEl = document.getElementById('hero-gauge-plot');
@@ -195,11 +206,31 @@
         // Render verdict
         InterpretationsModule.renderVerdict('verdict-container', data.overall);
 
-        // Render hawk score number in hero card
+        // Render hawk score with CountUp animation (ANIM-01)
         var scoreDisplay = document.getElementById('hawk-score-display');
         if (scoreDisplay) {
-          scoreDisplay.textContent =
-            Math.round(data.overall.hawk_score) + '/100';
+          var hawkScore = data.overall.hawk_score;
+          if (reducedMotion || typeof countUp === 'undefined'
+              || typeof countUp.CountUp !== 'function') {
+            // Static fallback: reduced motion or CDN failure
+            scoreDisplay.textContent = Math.round(hawkScore) + '/100';
+          } else {
+            scoreDisplay.textContent = '';
+            var counter = new countUp.CountUp('hawk-score-display',
+              Math.round(hawkScore), {
+                startVal: 0,
+                duration: 1.5,
+                useEasing: true,
+                useGrouping: false,
+                separator: '',
+                suffix: '/100'
+              });
+            if (!counter.error) {
+              counter.start();
+            } else {
+              scoreDisplay.textContent = Math.round(hawkScore) + '/100';
+            }
+          }
         }
 
         // Set zone-coloured top border on hero card
@@ -268,9 +299,6 @@
         renderCalculatorBridge(data.overall.hawk_score, data.overall.zone_label);
 
         // Animate hero card entry (only on success, respect reduced motion)
-        var reducedMotion = window.matchMedia(
-          '(prefers-reduced-motion: reduce)'
-        ).matches;
         if (heroCard && !reducedMotion) {
           heroCard.classList.add('hero-animate-in');
         }

@@ -13,6 +13,7 @@ module.exports = defineConfig([
         ...globals.browser,
         Plotly: "readonly",
         Decimal: "readonly",
+        countUp: "readonly",
         GaugesModule: "writable",
         ChartModule: "writable",
         DataModule: "writable",
