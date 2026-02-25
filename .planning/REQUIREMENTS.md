@@ -39,10 +39,10 @@ Requirements for v2.0 Local CI & Test Infrastructure. Each maps to roadmap phase
 
 ### Pre-Push Hook
 
-- [ ] **HOOK-01**: Pre-push git hook automatically runs fast test suite before push
-- [ ] **HOOK-02**: Fast test suite completes in under 10 seconds
-- [ ] **HOOK-03**: Developer can run fast tests manually via `npm run test:fast`
-- [ ] **HOOK-04**: Developer can run full verification manually via `npm run verify`
+- [x] **HOOK-01**: Pre-push git hook automatically runs fast test suite before push
+- [x] **HOOK-02**: Fast test suite completes in under 10 seconds
+- [x] **HOOK-03**: Developer can run fast tests manually via `npm run test:fast`
+- [x] **HOOK-04**: Developer can run full verification manually via `npm run verify`
 
 ## Future Requirements
 
@@ -87,10 +87,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LIVE-02 | Phase 14 | Complete |
 | LIVE-03 | Phase 14 | Complete |
 | LIVE-04 | Phase 14 | Complete |
-| HOOK-01 | Phase 15 | Pending |
-| HOOK-02 | Phase 15 | Pending |
-| HOOK-03 | Phase 15 | Pending |
-| HOOK-04 | Phase 15 | Pending |
+| HOOK-01 | Phase 15 | Complete |
+| HOOK-02 | Phase 15 | Complete |
+| HOOK-03 | Phase 15 | Complete |
+| HOOK-04 | Phase 15 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 22 total

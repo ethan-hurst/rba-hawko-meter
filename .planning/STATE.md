@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** "Data, not opinion." Empowers laypeople to understand interest rate drivers without relying on media sensationalism or biased advice.
-**Current focus:** v2.0 Local CI & Test Infrastructure — Phase 14: Live Verification
+**Current focus:** v2.0 Local CI & Test Infrastructure — Phase 15: Pre-Push Hook (COMPLETE)
 
 ## Current Position
 
-Phase: 14 (Live Verification)
+Phase: 15 (Pre-Push Hook)
 Plan: 01 complete
-Status: Phase 14 complete
-Last activity: 2026-02-25 — Phase 14 complete (9 live tests, verify summary script, npm scripts)
+Status: Phase 15 complete — v2.0 all phases complete
+Last activity: 2026-02-25 — Phase 15 complete (lefthook pre-push hook, test:fast + verify npm scripts)
 
 ```
-v2.0 Progress: [████████  ] 80%
-Phase 11 [✓] Phase 12 [✓] Phase 13 [✓] Phase 14 [✓] Phase 15 [ ]
+v2.0 Progress: [██████████] 100%
+Phase 11 [✓] Phase 12 [✓] Phase 13 [✓] Phase 14 [✓] Phase 15 [✓]
 ```
 
 ## Performance Metrics
@@ -83,6 +83,11 @@ Archived to PROJECT.md Key Decisions table. All v1.0 and v1.1 decisions preserve
 - Staleness threshold 90 days — warns but does not fail
 - verify_summary.py checks only 7 gauge keys + hawk_score range — full JSON schema validation owned by test_schema.py
 
+**v2.0 decisions (Plan 15-01):**
+- Use @evilmartians/lefthook with parallel pre-push hook (lint-py + lint-js + unit-tests); silent on success, 30s timeout
+- npm test:fast = lint + pytest non-live; npm verify = test:fast + live + playwright (three-tier sequence)
+- npx eslint in both lefthook.yml and lint:js for consistent local binary resolution
+
 ### Critical Context for v2.0
 
 - `DATA_DIR = Path("data")` in `pipeline/config.py` is a relative path — all tests must patch this via autouse fixture or they silently read/write live CSV files
@@ -98,6 +103,6 @@ None active.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed Phase 14 (Live Verification) — 9 live tests + verify summary + npm scripts
-Resume file: .planning/phases/14-live-verification/14-01-SUMMARY.md
-Next action: Proceed to Phase 15 (Pre-Push Hook)
+Stopped at: Completed Phase 15 (Pre-Push Hook) — lefthook pre-push hook + test:fast + verify npm scripts
+Resume file: .planning/phases/15-pre-push-hook/15-01-SUMMARY.md
+Next action: v2.0 complete — all 5 phases (11-15) delivered
