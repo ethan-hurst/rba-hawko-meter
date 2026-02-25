@@ -65,28 +65,28 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HERO-01 | — | Pending |
-| HERO-02 | — | Pending |
-| HERO-03 | — | Pending |
-| HERO-04 | — | Pending |
-| HERO-05 | — | Pending |
-| HERO-06 | — | Pending |
-| EXPL-01 | — | Pending |
-| EXPL-02 | — | Pending |
-| EXPL-03 | — | Pending |
-| EXPL-04 | — | Pending |
-| POLX-01 | — | Pending |
-| POLX-02 | — | Pending |
-| POLX-03 | — | Pending |
-| POLX-04 | — | Pending |
-| ANIM-01 | — | Pending |
-| ANIM-02 | — | Pending |
+| HERO-01 | Phase 21 | Pending |
+| HERO-02 | Phase 21 | Pending |
+| HERO-03 | Phase 21 | Pending |
+| HERO-04 | Phase 21 | Pending |
+| HERO-05 | Phase 21 | Pending |
+| HERO-06 | Phase 21 | Pending |
+| EXPL-01 | Phase 22 | Pending |
+| EXPL-02 | Phase 22 | Pending |
+| EXPL-03 | Phase 22 | Pending |
+| EXPL-04 | Phase 22 | Pending |
+| POLX-01 | Phase 23 | Pending |
+| POLX-02 | Phase 23 | Pending |
+| POLX-03 | Phase 23 | Pending |
+| POLX-04 | Phase 23 | Pending |
+| ANIM-01 | Phase 23 | Pending |
+| ANIM-02 | Phase 23 | Pending |
 
 **Coverage:**
 - v4.0 requirements: 16 total
-- Mapped to phases: 0
-- Unmapped: 16 ⚠️
+- Mapped to phases: 16
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-26*
-*Last updated: 2026-02-26 after initial definition*
+*Last updated: 2026-02-26 after v4.0 roadmap creation*

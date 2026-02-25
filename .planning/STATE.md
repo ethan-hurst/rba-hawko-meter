@@ -2,17 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-25)
+See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** "Data, not opinion." Empowers laypeople to understand interest rate drivers without relying on media sensationalism or biased advice.
-**Current focus:** Planning next milestone
+**Current focus:** Phase 21 — Hero HTML Restructure (v4.0)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-25 — Milestone v4.0 started
+Phase: 21 of 23 (Hero HTML Restructure)
+Plan: 0 of 1 in current phase
+Status: Ready to plan
+Last activity: 2026-02-26 — v4.0 roadmap created (Phases 21-23)
+
+Progress: [████████████░░░░░░░░] 60% (Phases 1-20 of 23 complete)
 
 ## Performance Metrics
 
@@ -30,13 +32,11 @@ Last activity: 2026-02-25 — Milestone v4.0 started
 - Phases: 11-17 (7 phases, 11 plans)
 - Timeline: 2 days (2026-02-24 → 2026-02-25)
 - Commits: 64, Files modified: 95, Lines: +13,776 / -1,190
-- Tests: 60+ pytest + 9 live + 28 Playwright
 
 **v3.0 Full Test Coverage:**
 - Phases: 18-20 (3 phases, 6 plans)
 - Timeline: 1 day (2026-02-25)
 - Commits: 26, Files modified: 100, Lines: +9,779
-- Tests: 411 pytest unit tests (all 13 pipeline/ modules at 85%+)
 
 ## Accumulated Context
 
@@ -44,12 +44,17 @@ Last activity: 2026-02-25 — Milestone v4.0 started
 
 All v1.0–v3.0 decisions archived to PROJECT.md Key Decisions table.
 
+v4.0 key constraints from research:
+- Phase 21: Wrap createHeroGauge() in requestAnimationFrame() to prevent Plotly zero-width render after DOM restructure
+- Phase 22: Use element.style with hex from getZoneColor() — never concatenate Tailwind class strings dynamically
+- Phase 23: prefers-reduced-motion guard is required on CountUp.js and gauge sweep animation (accessibility, not optional)
+
 ### Blockers/Concerns
 
 None active.
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Stopped at: v3.0 milestone archived
+Last session: 2026-02-26
+Stopped at: v4.0 roadmap created — Phases 21-23 defined, ready to plan Phase 21
 Resume file: None
