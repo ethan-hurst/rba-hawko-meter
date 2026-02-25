@@ -2,3 +2,8 @@ node_modules/
 test-results/
 playwright-report/
 __pycache__/
+
+# Coverage artifacts (ephemeral, not committed)
+.coverage
+.coverage.*
+.coverage.json
