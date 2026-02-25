@@ -1,0 +1,4 @@
+DATAFLOW,MEASURE: Measure,INDEX: Index,TSEST: Adjustment Type,REGION: Region,TIME_PERIOD,OBS_VALUE
+ABS:CPI,1: Index Numbers,10001: All groups CPI,10: Original,50: Australia,2024-Q1,136.8
+ABS:CPI,1: Index Numbers,10001: All groups CPI,10: Original,50: Australia,2024-Q2,137.4
+ABS:CPI,1: Index Numbers,10001: All groups CPI,10: Original,50: Australia,2024-Q3,138.1
