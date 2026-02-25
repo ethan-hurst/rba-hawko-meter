@@ -9,11 +9,10 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 
 ## Current Position
 
-Phase: v3.0 complete (Phases 18-20)
-Status: Milestone archived
-Last activity: 2026-02-25 — v3.0 Full Test Coverage shipped
-
-Progress: [██████████] 100% (v3.0 phases)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-25 — Milestone v4.0 started
 
 ## Performance Metrics
 

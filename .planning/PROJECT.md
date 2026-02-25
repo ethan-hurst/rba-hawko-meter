@@ -53,9 +53,20 @@ Empowers laypeople to understand interest rate drivers without relying on media 
 - ✓ ORCH-01 through ORCH-02: Orchestration tests (engine.py 96%, main.py 93%) — v3.0
 - ✓ ENFORCE-01 through ENFORCE-02: Coverage enforcement wired into npm test:fast and lefthook pre-push hook — v3.0
 
+## Current Milestone: v4.0 Dashboard Visual Overhaul
+
+**Goal:** Transform Hawk-O-Meter from data-dense dashboard into a polished, shareable product where the verdict and hawk score dominate the above-the-fold view.
+
+**Target features:**
+- Above-the-fold redesign — verdict + hawk score is the hero; supporting detail scrolls below
+- Verdict explanation — short "why?" section showing which indicators are driving the score up/down
+- Visual polish — consistent spacing, typography, colour hierarchy, dark theme refinement
+
 ### Active
 
-_(No active requirements — planning next milestone)_
+- [ ] Full above-the-fold redesign: verdict + hawk score as visual hero
+- [ ] Verdict explanation section: indicators driving the current hawk score
+- [ ] Visual polish: consistent spacing, typography, colour hierarchy across dashboard
 
 ### Out of Scope
 | Feature | Reason |
@@ -124,4 +135,4 @@ Automated data updates: weekly pipeline (Monday) + daily ASX futures (weekdays) 
 3. **Accurate:** ✓ All metrics normalized via ratios/Z-scores, no nominal currency values.
 
 ---
-*Last updated: 2026-02-25 after v3.0 milestone*
+*Last updated: 2026-02-25 after v4.0 milestone start*
