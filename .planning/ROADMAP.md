@@ -89,7 +89,9 @@ Plans:
   2. Developer runs `npm run test:python:live` and scraper tests for Cotality HVI and NAB capacity utilisation either pass or emit a warning — no unhandled exception crashes the suite
   3. Developer runs `npm run verify` and a full pipeline run produces a `status.json` file with all 7 indicator keys present and `hawk_score` in [0, 100]
   4. A live test that hits a URL that returns 404 emits a warning and exits 0 rather than failing the suite
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 14-01-PLAN.md -- Live test file (9 @pytest.mark.live tests) + verify summary script + npm scripts
 
 ### Phase 15: Pre-Push Hook
 **Goal**: Every `git push` automatically runs the fast quality gate and is rejected before reaching GitHub if the suite fails
@@ -113,5 +115,5 @@ Plans:
 | 11. Test Foundation | v2.0 | Complete    | 2026-02-24 | 2026-02-25 |
 | 12. Python Unit Tests | 2/2 | Complete    | 2026-02-24 | - |
 | 13. Linting Baseline | v2.0 | 2/2 | Complete | 2026-02-25 |
-| 14. Live Verification | v2.0 | 0/? | Not started | - |
+| 14. Live Verification | v2.0 | 0/1 | Planned | - |
 | 15. Pre-Push Hook | v2.0 | 0/? | Not started | - |
