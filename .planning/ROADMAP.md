@@ -55,11 +55,11 @@ Delivered: Test foundation (pyproject.toml + isolated fixtures), 60+ pytest unit
   2. `pytest-mock` and `responses` are importable in test files without install errors
   3. `tests/python/fixtures/` contains at least three scraper fixture files usable in ingest tests (sample ASX JSON response, RBA CSV with metadata headers, NAB article HTML)
   4. `python scripts/check_coverage.py --min 85` exits non-zero with a diff table when any `pipeline/` module is below 85%, and exits zero when all are at or above 85%
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 18-01: Wire pytest-cov into pyproject.toml addopts, add pytest-mock and responses to requirements-dev.txt, install and verify importability
-- [ ] 18-02: Create scraper fixture files and scripts/check_coverage.py
+- [ ] 18-01-PLAN.md — Wire pytest-cov into pyproject.toml addopts, add pytest-mock and responses to dev deps, gitignore coverage artifacts
+- [ ] 18-02-PLAN.md — Create 10 scraper fixture files for all 5 data sources and scripts/check_coverage.py coverage enforcement
 
 ### Phase 19: Ingest Module Tests
 **Goal**: Every ingest and utility module in `pipeline/` has 85%+ unit test coverage, with the mock-session pattern established and error paths fully exercised across all five scrapers and http_client
