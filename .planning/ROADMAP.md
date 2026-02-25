@@ -102,7 +102,9 @@ Plans:
   2. Developer runs `git push` on a clean, green codebase — the hook completes and the push succeeds in under 10 seconds
   3. Developer runs `npm run test:fast` directly and gets the same result as the pre-push hook (same gate, same exit code)
   4. Developer runs `npm run verify` and the full suite runs: fast tests + live pytest + Playwright — all three tiers run in sequence
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 15-01-PLAN.md -- Lefthook pre-push hook + test:fast/verify npm scripts
 
 ## Progress
 
@@ -116,4 +118,4 @@ Plans:
 | 12. Python Unit Tests | 2/2 | Complete    | 2026-02-24 | - |
 | 13. Linting Baseline | v2.0 | 2/2 | Complete | 2026-02-25 |
 | 14. Live Verification | 1/1 | Complete    | 2026-02-25 | - |
-| 15. Pre-Push Hook | v2.0 | 0/? | Not started | - |
+| 15. Pre-Push Hook | v2.0 | 0/1 | Not started | - |
