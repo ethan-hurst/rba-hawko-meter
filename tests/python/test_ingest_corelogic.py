@@ -6,9 +6,8 @@ Patches datetime at: pipeline.ingest.corelogic_scraper.datetime
 Patches pdfplumber at: pipeline.ingest.corelogic_scraper.pdfplumber
 """
 
-import io
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pandas as pd

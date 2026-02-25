@@ -5,13 +5,11 @@ Patches create_session at: pipeline.ingest.nab_scraper.create_session
 Patches datetime at: pipeline.ingest.nab_scraper.datetime
 """
 
-import io
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-import pytest
 import requests.exceptions
 
 import pipeline.config
@@ -195,7 +193,10 @@ class TestExtractCapacityFromHtml:
 
     def test_australian_spelling_variant(self):
         """Regex handles 'Capacity utilisation' in various text contexts."""
-        html = b'<html><body><p>Capacity utilisation increased to 82.1% in the quarter.</p></body></html>'
+        html = (
+            b"<html><body><p>Capacity utilisation increased "
+            b"to 82.1% in the quarter.</p></body></html>"
+        )
         result = extract_capacity_from_html(html)
         assert result == 82.1
 
@@ -563,7 +564,7 @@ class TestScrapeNabCapacity:
         mock_session = MagicMock()
         mock_session.get.return_value = resp
         with patch(PATCH_TARGET, return_value=mock_session):
-            df = scrape_nab_capacity()
+            scrape_nab_capacity()
         assert mock_session.get.call_count > 0
 
     def test_no_pdf_link_path(self, monkeypatch):

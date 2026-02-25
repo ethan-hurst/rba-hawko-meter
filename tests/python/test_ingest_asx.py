@@ -7,7 +7,6 @@ Patches datetime at: pipeline.ingest.asx_futures_scraper.datetime
 
 import json
 from datetime import datetime
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
