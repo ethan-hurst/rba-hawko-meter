@@ -6,7 +6,7 @@
 - ✅ **v1.1 Full Indicator Coverage** — Phases 8-10 (shipped 2026-02-24)
 - ✅ **v2.0 Local CI & Test Infrastructure** — Phases 11-17 (shipped 2026-02-25)
 - ✅ **v3.0 Full Test Coverage** — Phases 18-20 (shipped 2026-02-25)
-- 🚧 **v4.0 Dashboard Visual Overhaul** — Phases 21-23 (in progress)
+- ✅ **v4.0 Dashboard Visual Overhaul** — Phases 21-23 (shipped 2026-02-26)
 
 ## Phases
 
@@ -46,54 +46,14 @@ Delivered: pytest-cov auto-measurement on every run, 10 scraper fixture files fo
 
 </details>
 
-### 🚧 v4.0 Dashboard Visual Overhaul (In Progress)
+<details>
+<summary>✅ v4.0 Dashboard Visual Overhaul (Phases 21-23) — SHIPPED 2026-02-26</summary>
 
-**Milestone Goal:** Transform Hawk-O-Meter from data-dense dashboard into a polished, shareable product where the verdict and hawk score dominate the above-the-fold view.
+3 phases, 3 plans completed. Full details in milestones/v4.0-ROADMAP.md.
 
-## Phase Details
+Delivered: Hero section DOM restructure with Inter font and zone-coloured border, verdict explanation component with ASIC-compliant hedged language, typography hierarchy and spacing standardisation, CountUp.js animated hawk score, Plotly gauge sweep animation, prefers-reduced-motion accessibility guards.
 
-### Phase 21: Hero HTML Restructure
-**Goal**: Users see the verdict and hawk score as the dominant above-the-fold experience with a stable, correctly-sized DOM ready for JS and CSS work
-**Depends on**: Phase 20 (v3.0 complete)
-**Requirements**: HERO-01, HERO-02, HERO-03, HERO-04, HERO-05, HERO-06
-**Success Criteria** (what must be TRUE):
-  1. User sees the verdict label as the largest above-the-fold text element on any viewport from 375px to 1440px, without scrolling
-  2. User sees the hawk score as a prominent number ("38/100") and the scale explainer ("0 = Strongly Dovish → 100 = Strongly Hawkish") alongside the verdict inside the hero card — both visible above the fold
-  3. User sees a data freshness badge inside the hero card and a zone-coloured accent border that changes colour with the hawk/dove/neutral zone
-  4. The Plotly hawk gauge renders at its correct width on all tested viewports after the DOM restructure — no zero-width render regression
-  5. All 28 Playwright tests pass after the structural HTML change
-**Plans**: 1 plan, 1 wave
-
-Plans:
-- [x] 21-01: Hero section DOM restructure, Inter font, keyframes, tailwind.config extension
-
-### Phase 22: Verdict Explanation Component
-**Goal**: Users understand which indicators are pushing the hawk score up or down via a plain-English, ASIC-compliant explanation section
-**Depends on**: Phase 21
-**Requirements**: EXPL-01, EXPL-02, EXPL-03, EXPL-04
-**Success Criteria** (what must be TRUE):
-  1. User sees a plain-English list of the top 3 hawkish indicators driving the score up, rendered below the hero on page load
-  2. User sees a plain-English list of the top 2 dovish indicators pulling the score down — neutral indicators are absent from both lists
-  3. All explanation copy uses hedged language ("tends to", "historically associated with", "the data is consistent with") with no predictive statements or recommendations
-  4. The explanation section updates correctly with real data from status.json and uses zone colours via element.style (not Tailwind class concatenation)
-**Plans**: 1 plan, 1 wave
-
-Plans:
-- [x] 22-01: renderVerdictExplanation() in interpretations.js, wire in gauge-init.js
-
-### Phase 23: Visual Polish and Animations
-**Goal**: Users experience a visually cohesive dashboard with consistent typography, spacing, and colour hierarchy, plus animated entry effects on the hero score and gauge
-**Depends on**: Phase 22
-**Requirements**: POLX-01, POLX-02, POLX-03, POLX-04, ANIM-01, ANIM-02
-**Success Criteria** (what must be TRUE):
-  1. User perceives a clear typography hierarchy: verdict label is largest, hawk score is prominent, secondary labels are visually distinct, body text and metadata are readable but subordinate
-  2. Zone colour (blue/grey/red) appears on exactly three element types — verdict label, hero card border, explanation section headings — and nowhere else on the dashboard
-  3. User on a 375px phone sees verdict and score above the fold with no layout congestion and consistent spacing across all dashboard sections
-  4. User sees the hawk score count up from 0 to the live value on page load, with the Plotly gauge sweeping from 0 to the live score — both animations respect prefers-reduced-motion
-**Plans**: TBD
-
-Plans:
-- [ ] 23-01: CSS audit, typography hierarchy, spacing standardisation, CountUp.js, gauge sweep animation
+</details>
 
 ## Progress
 
@@ -113,6 +73,6 @@ Plans:
 | 18. Test Infrastructure | v3.0 | 2/2 | Complete | 2026-02-25 |
 | 19. Ingest Module Tests | v3.0 | 2/2 | Complete | 2026-02-25 |
 | 20. Orchestration Tests and Enforcement | v3.0 | 2/2 | Complete | 2026-02-25 |
-| 21. Hero HTML Restructure | v4.0 | Complete    | 2026-02-25 | 2026-02-26 |
-| 22. Verdict Explanation Component | v4.0 | Complete    | 2026-02-25 | 2026-02-26 |
-| 23. Visual Polish and Animations | 1/1 | Complete    | 2026-02-25 | - |
+| 21. Hero HTML Restructure | v4.0 | 1/1 | Complete | 2026-02-26 |
+| 22. Verdict Explanation Component | v4.0 | 1/1 | Complete | 2026-02-26 |
+| 23. Visual Polish and Animations | v4.0 | 1/1 | Complete | 2026-02-26 |

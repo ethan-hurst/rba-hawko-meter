@@ -95,3 +95,27 @@
 
 ---
 
+
+## v4.0 Dashboard Visual Overhaul (Shipped: 2026-02-26)
+
+**Phases completed:** 3 phases, 3 plans, ~9 tasks
+
+**Key accomplishments:**
+- Hero section DOM restructure with Inter font, zone-coloured border, hawk score display, and fadeSlideIn animation — verdict dominates above-the-fold
+- Verdict explanation component showing top 3 hawkish and top 2 dovish indicators in ASIC-compliant hedged language
+- Typography hierarchy fix (verdict text-2xl/3xl) and zone colour audit limiting colour to exactly 3 element types
+- CountUp.js 2.9.0 animated hawk score counting from 0 to live value with easeOutExpo
+- Plotly gauge sweep animation via requestAnimationFrame stepping (Plotly.animate doesn't support indicator traces)
+- prefers-reduced-motion accessibility guard on all 3 animations (CountUp, gauge sweep, fadeSlideIn)
+
+**Stats:**
+- Timeline: 2026-02-26 (1 day)
+- Commits: 9 (6 feat/fix + 3 docs)
+- Files modified: 18
+- Lines changed: +2,726 / -73
+- JS LOC: 3,664 total
+- Tests: 421 pytest + 28 Playwright (100% pass)
+- Git range: feat(21-01) → docs(phase-23)
+
+---
+

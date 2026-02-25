@@ -1,7 +1,7 @@
 # Project: RBA Hawk-O-Meter
 
 ## What This Is
-An automated, unbiased economic dashboard for Australian mortgage holders. Ingests raw economic data from ABS, RBA, ASX, CoreLogic/Cotality, and NAB, normalizes it via Z-scores, and presents interest rate pressure through traffic-light gauges, a mortgage impact calculator, and plain English interpretations. 7 of 8 indicators active with full data coverage. Live at Netlify with daily/weekly automated data updates via GitHub Actions. All 13 pipeline/ modules covered at 85%+ by 411 unit tests with per-module enforcement in pre-push hook.
+An automated, unbiased economic dashboard for Australian mortgage holders. Ingests raw economic data from ABS, RBA, ASX, CoreLogic/Cotality, and NAB, normalizes it via Z-scores, and presents interest rate pressure through traffic-light gauges, a mortgage impact calculator, and plain English interpretations. 7 of 8 indicators active with full data coverage. Live at Netlify with daily/weekly automated data updates via GitHub Actions. All 13 pipeline/ modules covered at 85%+ by 421 unit tests with per-module enforcement in pre-push hook. Dashboard features a hero verdict section with animated hawk score, verdict explanation showing which indicators drive the score, and polished visual hierarchy with accessibility guards.
 
 ## Core Value
 **"Data, not opinion."**
@@ -15,7 +15,7 @@ Empowers laypeople to understand interest rate drivers without relying on media 
 
 ## Scope
 - **Backend:** Python-based ETL pipeline (ingest → normalize → Z-score → status.json).
-- **Frontend:** Static HTML/JS dashboard using Plotly.js for gauges, Tailwind CSS, Decimal.js for calculator.
+- **Frontend:** Static HTML/JS dashboard using Plotly.js for gauges, Tailwind CSS, Decimal.js for calculator, CountUp.js for score animation.
 - **Automation:** Weekly pipeline (Monday) + daily ASX futures scraper (weekdays) via GitHub Actions.
 - **Data Sources:** ABS (official — CPI, employment, wages, spending, building approvals, RPPI housing), RBA (official — cash rate, meetings), ASX (JSON API — futures), Cotality HVI (PDF scraping — dwelling prices), NAB (HTML/PDF scraping — capacity utilisation).
 
@@ -52,21 +52,14 @@ Empowers laypeople to understand interest rate drivers without relying on media 
 - ✓ INGEST-01 through INGEST-06: Ingest module unit tests (abs_data, rba_data, asx_futures, corelogic, nab, http_client at 85%+) — v3.0
 - ✓ ORCH-01 through ORCH-02: Orchestration tests (engine.py 96%, main.py 93%) — v3.0
 - ✓ ENFORCE-01 through ENFORCE-02: Coverage enforcement wired into npm test:fast and lefthook pre-push hook — v3.0
-
-## Current Milestone: v4.0 Dashboard Visual Overhaul
-
-**Goal:** Transform Hawk-O-Meter from data-dense dashboard into a polished, shareable product where the verdict and hawk score dominate the above-the-fold view.
-
-**Target features:**
-- Above-the-fold redesign — verdict + hawk score is the hero; supporting detail scrolls below
-- Verdict explanation — short "why?" section showing which indicators are driving the score up/down
-- Visual polish — consistent spacing, typography, colour hierarchy, dark theme refinement
+- ✓ HERO-01 through HERO-06: Hero section DOM restructure with Inter font, zone border, score display, freshness badge, fadeSlideIn animation — v4.0
+- ✓ EXPL-01 through EXPL-04: Verdict explanation component with ranked hawkish/dovish indicators and ASIC-compliant hedged language — v4.0
+- ✓ POLX-01 through POLX-04: Visual polish — typography hierarchy, zone colour audit, spacing standardisation, mobile above-fold — v4.0
+- ✓ ANIM-01 through ANIM-02: CountUp.js hawk score animation + Plotly gauge sweep with prefers-reduced-motion guards — v4.0
 
 ### Active
 
-- [ ] Full above-the-fold redesign: verdict + hawk score as visual hero
-- [ ] Verdict explanation section: indicators driving the current hawk score
-- [ ] Visual polish: consistent spacing, typography, colour hierarchy across dashboard
+(No active requirements — define next milestone with `/gsd:new-milestone`)
 
 ### Out of Scope
 | Feature | Reason |
@@ -82,6 +75,9 @@ Empowers laypeople to understand interest rate drivers without relying on media 
 | Type checking (mypy) | Ruff catches most issues for this codebase size |
 | Mutation testing | Overkill for current codebase size |
 | Integration tests (E2E pipeline) | Future milestone — local mocked unit tests are sufficient now |
+| Dark/light theme toggle | Dual Tailwind class definitions + Plotly rewrites — high complexity, low value |
+| Tailwind v4 CDN upgrade | Incompatible config format; no feature benefit |
+| Plotly.js v3 upgrade | Breaking changes to title API; no feature benefit |
 
 ## Key Decisions
 | Decision | Rationale | Outcome |
@@ -117,22 +113,27 @@ Empowers laypeople to understand interest rate drivers without relying on media 
 | **MockDatetime class** | `@freeze_time` unavailable; need strptime/strftime delegation | ✓ MockDatetime freezes now()/utcnow() while delegating other methods |
 | **pdfplumber via sys.modules** | Lazy import makes pdfplumber unreachable via normal patch path | ✓ Mock injected via sys.modules before module import |
 | **No --cov-fail-under in addopts** | Global threshold hides per-module gaps | ✓ Per-module enforcement in check_coverage.py --min flag |
+| **Double rAF for Plotly after DOM restructure** | Single rAF insufficient; Plotly needs layout pass before resize | ✓ Nested requestAnimationFrame + Plotly.Plots.resize prevents zero-width |
+| **element.style for zone colours** | Tailwind CDN silently drops dynamically concatenated classes | ✓ All zone colours set via element.style with hex from getZoneColor() |
+| **CountUp.js via CDN with fallback** | NPM not available (no build system); CDN failure must be graceful | ✓ jsDelivr CDN with static textContent fallback on load failure |
+| **rAF stepping for gauge sweep** | Plotly.animate() doesn't support smooth transitions for indicator traces | ✓ requestAnimationFrame + Plotly.react() stepping over 1500ms |
+| **Shared reducedMotion check** | Avoid repeated matchMedia calls across 3 animations | ✓ Single check at top of .then() handler, shared by CountUp/gauge/fadeSlideIn |
 
 ## Context
 
-Shipped v3.0 with ~9,514 Python LOC (includes 411 unit tests + 9 live tests). JS unchanged at ~2,510 LOC.
-Tech stack: Python (pandas, numpy, requests, beautifulsoup4, pdfplumber, pytest, pytest-cov, pytest-mock, responses, ruff), Vanilla JS (ESLint v10), Tailwind CSS, Plotly.js, Decimal.js.
-Test suite: 411 pytest unit tests + 9 live tests + 28 Playwright tests (100% pass).
-Coverage: All 13 pipeline/ modules at 85%+ (range: 90–100%). Coverage gate active in pre-push hook and npm test:fast.
+Shipped v4.0 with ~9,514 Python LOC (includes 421 unit tests + 9 live tests). JS at ~3,664 LOC (up from 2,510 after hero + explanation + animation additions).
+Tech stack: Python (pandas, numpy, requests, beautifulsoup4, pdfplumber, pytest, pytest-cov, pytest-mock, responses, ruff), Vanilla JS (ESLint v10), Tailwind CSS v3, Plotly.js 2.35.2, Decimal.js, CountUp.js 2.9.0, Inter font (Google Fonts CDN).
+Test suite: 421 pytest unit tests + 9 live tests + 28 Playwright tests (100% pass).
+Coverage: All 13 pipeline/ modules at 85%+ (range: 90-100%). Coverage gate active in pre-push hook and npm test:fast.
 Quality gate: Lefthook pre-push hook (lint + unit tests + coverage check in <45s), three-tier npm verify.
 7 of 8 economic indicators active (ASX futures displayed separately as 8th). All data source gaps closed.
-Dashboard coverage: "Based on 7 of 8 indicators".
+Dashboard: Hero verdict section with animated hawk score (CountUp.js), verdict explanation with ranked indicators, zone-coloured visual hierarchy, and prefers-reduced-motion accessibility guards.
 Automated data updates: weekly pipeline (Monday) + daily ASX futures (weekdays) via GitHub Actions.
 
 ## Success Criteria
 1. **Fully Automated:** ✓ Runs weekly + daily without manual intervention.
-2. **Understandable:** ✓ Layperson understands rate pressure in < 5 seconds via plain English verdicts.
+2. **Understandable:** ✓ Layperson understands rate pressure in < 5 seconds via plain English verdicts and indicator explanations.
 3. **Accurate:** ✓ All metrics normalized via ratios/Z-scores, no nominal currency values.
 
 ---
-*Last updated: 2026-02-25 after v4.0 milestone start*
+*Last updated: 2026-02-26 after v4.0 milestone*
