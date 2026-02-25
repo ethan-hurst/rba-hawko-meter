@@ -9,8 +9,8 @@ Requirements for 85%+ per-module test coverage across all pipeline/ modules.
 
 ### Test Infrastructure
 
-- [ ] **INFRA-01**: pytest-cov wired into pyproject.toml addopts with term-missing and JSON report output
-- [ ] **INFRA-02**: pytest-mock and responses added to dev dependencies (requirements-dev.txt + installed)
+- [x] **INFRA-01**: pytest-cov wired into pyproject.toml addopts with term-missing and JSON report output
+- [x] **INFRA-02**: pytest-mock and responses added to dev dependencies (requirements-dev.txt + installed)
 - [ ] **INFRA-03**: Test fixtures directory with sample HTML, PDF text, and CSV data for scraper tests
 - [ ] **INFRA-04**: Per-module coverage check script enforcing 85% minimum per file in pipeline/
 
@@ -58,8 +58,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 18 | Pending |
-| INFRA-02 | Phase 18 | Pending |
+| INFRA-01 | Phase 18 | Complete |
+| INFRA-02 | Phase 18 | Complete |
 | INFRA-03 | Phase 18 | Pending |
 | INFRA-04 | Phase 18 | Pending |
 | INGEST-01 | Phase 19 | Pending |

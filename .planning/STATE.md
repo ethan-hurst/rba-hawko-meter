@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 ## Current Position
 
 Phase: 18 of 20 (Test Infrastructure)
-Plan: 0 of 2 in current phase
-Status: Ready to plan
-Last activity: 2026-02-25 — Roadmap created for v3.0
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-25 — Plan 18-01 complete (pytest-cov + dev deps)
 
-Progress: [░░░░░░░░░░] 0% (v3.0 phases)
+Progress: [██░░░░░░░░] 17% (v3.0 phases)
 
 ## Performance Metrics
 
@@ -46,6 +46,8 @@ Recent decisions affecting v3.0:
 - `main.run_pipeline()` calls `sys.exit(1)` on critical failure — must wrap in `pytest.raises(SystemExit)` or the entire test runner terminates
 - Use `MagicMock` + `create_session` patching as primary HTTP mock pattern; `responses` library available if transport-layer interception is needed but not the default
 - Date-dependent CoreLogic and NAB tests must patch `datetime` at module level or use `@freeze_time` to prevent non-deterministic CI failures
+- Coverage scoped to pipeline/ only via --cov=pipeline — test files excluded from measurement
+- No --cov-fail-under in addopts — per-module enforcement handled by check_coverage.py script
 
 ### Blockers/Concerns
 
@@ -54,5 +56,5 @@ None active.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Roadmap created, requirements mapped, ready to plan Phase 18
+Stopped at: Completed 18-01-PLAN.md
 Resume file: None
