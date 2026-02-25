@@ -80,6 +80,35 @@ def block_network(monkeypatch, request):
 
 
 # =============================================================================
+# engine_data_dir fixture — isolates STATUS_OUTPUT for engine tests
+# =============================================================================
+
+
+@pytest.fixture
+def engine_data_dir(monkeypatch, tmp_path):
+    """
+    Patch pipeline.normalize.engine.STATUS_OUTPUT to tmp_path/status.json.
+
+    Use this fixture for any test that calls generate_status() or any function
+    that writes to STATUS_OUTPUT. The isolate_data_dir autouse fixture already
+    handles DATA_DIR; this fixture adds STATUS_OUTPUT isolation so tests never
+    write to public/data/status.json.
+
+    Patch target is the import site (pipeline.normalize.engine.STATUS_OUTPUT),
+    not the source (pipeline.config.STATUS_OUTPUT), because engine.py binds the
+    name at import time via `from pipeline.config import STATUS_OUTPUT`.
+    """
+    import pipeline.normalize.engine
+
+    monkeypatch.setattr(
+        pipeline.normalize.engine,
+        "STATUS_OUTPUT",
+        tmp_path / "status.json",
+    )
+    yield tmp_path
+
+
+# =============================================================================
 # Named CSV loader fixtures (not autouse — tests request them explicitly)
 # =============================================================================
 
