@@ -233,6 +233,22 @@
           'hero-freshness', data.generated_at
         );
 
+        // Render verdict explanation section (Phase 22)
+        var mainEl = document.querySelector('main');
+        var countdownSection = document.getElementById('countdown-section');
+        if (mainEl && countdownSection) {
+          var explanationSection = document.createElement('section');
+          explanationSection.id = 'verdict-explanation';
+          explanationSection.setAttribute('aria-label', 'Score explanation');
+          explanationSection.className =
+            'bg-finance-gray border border-finance-border'
+            + ' rounded-xl px-6 py-5';
+          mainEl.insertBefore(explanationSection, countdownSection);
+          InterpretationsModule.renderVerdictExplanation(
+            'verdict-explanation', data
+          );
+        }
+
         // Render individual metric gauges
         renderMetricGauges(data.gauges);
 

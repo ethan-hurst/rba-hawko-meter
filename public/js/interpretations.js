@@ -566,6 +566,241 @@ var InterpretationsModule = (function () {
   }
 
   /**
+   * Rank indicators by weighted contribution to the hawk score.
+   * Positive contributions are hawkish (pushing score up);
+   * negative contributions are dovish (pulling score down).
+   * @param {Object} gaugesData - data.gauges from status.json
+   * @returns {{ hawkish: Array, dovish: Array }} Sorted, filtered arrays
+   */
+  function rankIndicators(gaugesData) {
+    var hawkish = [];
+    var dovish = [];
+    var THRESHOLD = 0.5;
+
+    Object.keys(gaugesData).forEach(function (metricId) {
+      var m = gaugesData[metricId];
+      if (m.value == null) return;
+      if (isDataSuspect(metricId, m)) return;
+
+      var contribution = (m.value - 50) * m.weight;
+
+      if (contribution >= THRESHOLD) {
+        hawkish.push({ id: metricId, data: m, contribution: contribution });
+      } else if (contribution <= -THRESHOLD) {
+        dovish.push({ id: metricId, data: m, contribution: contribution });
+      }
+    });
+
+    // Sort hawkish descending by contribution
+    hawkish.sort(function (a, b) {
+      return b.contribution - a.contribution;
+    });
+    // Sort dovish by most negative first
+    dovish.sort(function (a, b) {
+      return a.contribution - b.contribution;
+    });
+
+    return {
+      hawkish: hawkish.slice(0, 3),
+      dovish: dovish.slice(0, 2)
+    };
+  }
+
+  /**
+   * Get a single ASIC-compliant explanation sentence for an indicator.
+   * Combines a factual reading with a hedged causal link to interest rates.
+   * @param {string} metricId - Metric identifier (e.g. 'inflation')
+   * @param {Object} metricData - Gauge data from status.json
+   * @returns {string} Single hedged explanation sentence
+   */
+  function getExplanationSentence(metricId, metricData) {
+    var raw = metricData.raw_value != null
+      ? parseFloat(metricData.raw_value).toFixed(1)
+      : null;
+    var v = metricData.value;
+
+    switch (metricId) {
+      case 'inflation':
+        if (v < 50) {
+          return 'Inflation at ' + raw
+            + '% per year is within the RBA\u2019s target range,'
+            + ' which has historically been associated with less'
+            + ' pressure to raise interest rates.';
+        }
+        return 'Inflation at ' + raw
+          + '% per year is above the RBA\u2019s target range,'
+          + ' which tends to increase pressure'
+          + ' on interest rates.';
+
+      case 'wages':
+        if (v > 60) {
+          return 'Wages growing at ' + raw
+            + '% per year tends to push up costs and prices,'
+            + ' which has historically been associated with'
+            + ' upward pressure on rates.';
+        }
+        return 'Wage growth at ' + raw
+          + '% per year is subdued, which tends to reduce'
+          + ' upward pressure on prices and interest rates.';
+
+      case 'employment':
+        if (v > 60) {
+          return 'The job market is very tight, with strong'
+            + ' demand for workers, which tends to push up'
+            + ' wages and prices.';
+        }
+        return 'The job market is softening, which has'
+          + ' historically been associated with less pressure'
+          + ' on interest rates.';
+
+      case 'housing':
+        if (v > 60) {
+          return 'Housing prices are rising at ' + raw
+            + '% per year, which has historically been'
+            + ' associated with upward pressure'
+            + ' on interest rates.';
+        }
+        return 'Housing price growth has slowed, which tends'
+          + ' to reduce pressure on interest rates.';
+
+      case 'spending':
+        if (v > 60) {
+          return 'Consumer spending is running above trend,'
+            + ' which tends to add to price pressures.';
+        }
+        return 'Consumer spending is subdued, which has'
+          + ' historically been associated with less'
+          + ' inflationary pressure.';
+
+      case 'building_approvals':
+        if (v > 60) {
+          return 'Building approvals are above average, which'
+            + ' is consistent with strong demand in the'
+            + ' construction sector.';
+        }
+        return 'Building approvals are below average, which'
+          + ' tends to signal a slowing construction sector.';
+
+      case 'business_confidence':
+        if (v > 60) {
+          return 'Capacity utilisation at ' + raw
+            + '% is above the long-run average, which tends'
+            + ' to signal inflationary pressure.';
+        }
+        return 'Capacity utilisation is below average, which'
+          + ' has historically been associated with reduced'
+          + ' pressure on prices.';
+
+      default:
+        return 'This indicator is currently '
+          + (v > 50 ? 'above' : 'below')
+          + ' its historical average.';
+    }
+  }
+
+  /**
+   * Render the verdict explanation section with hawkish/dovish indicator lists.
+   * Creates zone-coloured headings and plain-English explanation sentences.
+   * @param {string} containerId - Target section element ID
+   * @param {Object} data - Full status.json data object
+   */
+  function renderVerdictExplanation(containerId, data) {
+    var container = document.getElementById(containerId);
+    if (!container || !data || !data.gauges) return;
+    container.textContent = '';
+
+    var ranked = rankIndicators(data.gauges);
+
+    // Handle case: no qualifying indicators
+    if (ranked.hawkish.length === 0 && ranked.dovish.length === 0) {
+      // Check if score is non-neutral but no single indicator passes threshold
+      if (data.overall && (data.overall.hawk_score > 60
+        || data.overall.hawk_score < 40)) {
+        // Find top 1 indicator from dominant direction without threshold
+        var allIndicators = [];
+        Object.keys(data.gauges).forEach(function (metricId) {
+          var m = data.gauges[metricId];
+          if (m.value == null) return;
+          if (isDataSuspect(metricId, m)) return;
+          allIndicators.push({
+            id: metricId, data: m,
+            contribution: (m.value - 50) * m.weight
+          });
+        });
+        var dominant;
+        if (data.overall.hawk_score > 60) {
+          allIndicators.sort(function (a, b) {
+            return b.contribution - a.contribution;
+          });
+          dominant = allIndicators[0];
+        } else {
+          allIndicators.sort(function (a, b) {
+            return a.contribution - b.contribution;
+          });
+          dominant = allIndicators[0];
+        }
+        if (dominant) {
+          var softP = document.createElement('p');
+          softP.className = 'text-sm text-gray-300';
+          softP.textContent = 'The main contributor is: '
+            + getExplanationSentence(dominant.id, dominant.data)
+            + ' Though no single indicator is applying'
+            + ' strong pressure.';
+          container.appendChild(softP);
+          return;
+        }
+      }
+
+      var neutral = document.createElement('p');
+      neutral.className = 'text-sm text-gray-400';
+      neutral.textContent =
+        'No indicators are currently applying significant'
+        + ' pressure in either direction, which is consistent'
+        + ' with the balanced reading.';
+      container.appendChild(neutral);
+      return;
+    }
+
+    // Hawkish section
+    if (ranked.hawkish.length > 0) {
+      var hawkH = document.createElement('h3');
+      hawkH.className = 'text-base font-semibold mb-2';
+      hawkH.style.color = GaugesModule.getZoneColor(75);
+      hawkH.textContent = 'Pushing the score up';
+      container.appendChild(hawkH);
+
+      var hawkUl = document.createElement('ul');
+      hawkUl.className = 'list-disc list-inside mb-4 space-y-1';
+      ranked.hawkish.forEach(function (item) {
+        var li = document.createElement('li');
+        li.className = 'text-sm text-gray-300';
+        li.textContent = getExplanationSentence(item.id, item.data);
+        hawkUl.appendChild(li);
+      });
+      container.appendChild(hawkUl);
+    }
+
+    // Dovish section
+    if (ranked.dovish.length > 0) {
+      var doveH = document.createElement('h3');
+      doveH.className = 'text-base font-semibold mb-2 mt-4';
+      doveH.style.color = GaugesModule.getZoneColor(25);
+      doveH.textContent = 'Pulling the score down';
+      container.appendChild(doveH);
+
+      var doveUl = document.createElement('ul');
+      doveUl.className = 'list-disc list-inside space-y-1';
+      ranked.dovish.forEach(function (item) {
+        var li = document.createElement('li');
+        li.className = 'text-sm text-gray-300';
+        li.textContent = getExplanationSentence(item.id, item.data);
+        doveUl.appendChild(li);
+      });
+      container.appendChild(doveUl);
+    }
+  }
+
+  /**
    * Render a complete metric card with gauge container,
    * interpretation, weight, and source.
    * @param {string} containerId - Parent container DOM element ID
@@ -689,6 +924,8 @@ var InterpretationsModule = (function () {
     getPlainVerdict: getPlainVerdict,
     formatAusDate: formatAusDate,
     isDataSuspect: isDataSuspect,
-    toQuarterLabel: toQuarterLabel
+    toQuarterLabel: toQuarterLabel,
+    renderVerdictExplanation: renderVerdictExplanation,
+    getExplanationSentence: getExplanationSentence
   };
 })();
