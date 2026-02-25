@@ -30,7 +30,7 @@ Delivered: ASX futures multi-meeting probability table, ABS RPPI + Cotality HVI 
 
 - [x] **Phase 11: Test Foundation** — pyproject.toml config hub + isolated test harness (conftest.py + fixtures)
 - [x] **Phase 12: Python Unit Tests** — Pure-function coverage for zscore, gauge, ratios, csv_handler, status.json schema (completed 2026-02-24)
-- [ ] **Phase 13: Linting Baseline** — Ruff (Python) + ESLint v10 (JS) verified clean before hook is enabled
+- [x] **Phase 13: Linting Baseline** — Ruff (Python) + ESLint v10 (JS) verified clean before hook is enabled (completed 2026-02-25)
 - [ ] **Phase 14: Live Verification** — On-demand end-to-end verification against real APIs and live scrapers
 - [ ] **Phase 15: Pre-Push Hook** — Automated fast gate via lefthook + unified npm scripts
 
@@ -77,8 +77,8 @@ Plans:
   4. Introducing an unused import in a pipeline file causes `npm run lint:py` to fail with a violation message pointing to the correct file and line
 **Plans**: 2 plans
 Plans:
-- [ ] 13-01-PLAN.md -- Ruff baseline cleanup (auto-fix + manual E501/B904)
-- [ ] 13-02-PLAN.md -- ESLint v10 setup, config, JS cleanup, and npm lint scripts
+- [x] 13-01-PLAN.md -- Ruff baseline cleanup (auto-fix + manual E501/B904)
+- [x] 13-02-PLAN.md -- ESLint v10 setup, config, JS cleanup, and npm lint scripts
 
 ### Phase 14: Live Verification
 **Goal**: Developer can confirm the full pipeline works against real external endpoints without touching the unit test suite
@@ -112,6 +112,6 @@ Plans:
 | 10. NAB Capacity Utilisation Gauge | v1.1 | 2/2 | Complete | 2026-02-24 |
 | 11. Test Foundation | v2.0 | Complete    | 2026-02-24 | 2026-02-25 |
 | 12. Python Unit Tests | 2/2 | Complete    | 2026-02-24 | - |
-| 13. Linting Baseline | v2.0 | 0/2 | Planned | - |
+| 13. Linting Baseline | v2.0 | 2/2 | Complete | 2026-02-25 |
 | 14. Live Verification | v2.0 | 0/? | Not started | - |
 | 15. Pre-Push Hook | v2.0 | 0/? | Not started | - |

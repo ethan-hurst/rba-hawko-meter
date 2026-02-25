@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** "Data, not opinion." Empowers laypeople to understand interest rate drivers without relying on media sensationalism or biased advice.
-**Current focus:** v2.0 Local CI & Test Infrastructure — Phase 12: Python Unit Tests
+**Current focus:** v2.0 Local CI & Test Infrastructure — Phase 13: Linting Baseline
 
 ## Current Position
 
-Phase: 12 (Python Unit Tests)
+Phase: 13 (Linting Baseline)
 Plan: 02 complete
-Status: Plan 12-02 complete
-Last activity: 2026-02-25 — Plan 12-02 complete (54 unit tests for ratios.py, csv_handler.py, schema contract)
+Status: Phase 13 complete
+Last activity: 2026-02-25 — Phase 13 complete (ruff + ESLint v10 baseline cleanup, zero violations, npm lint scripts)
 
 ```
-v2.0 Progress: [████      ] 40%
-Phase 11 [✓] Phase 12 [~] Phase 13 [ ] Phase 14 [ ] Phase 15 [ ]
+v2.0 Progress: [██████    ] 60%
+Phase 11 [✓] Phase 12 [✓] Phase 13 [✓] Phase 14 [ ] Phase 15 [ ]
 ```
 
 ## Performance Metrics
@@ -68,6 +68,15 @@ Archived to PROJECT.md Key Decisions table. All v1.0 and v1.1 decisions preserve
 - Use jsonschema StrictValidator (Draft7 + custom type_checker) to enforce hawk_score as Python int, not float
 - Auto-fixed load_indicator_csv to return None for header-only CSV (empty DataFrame was missing correctness check)
 
+**v2.0 decisions (Phase 13):**
+- Ruff auto-fix first, then manual B904 + E501 — no noqa suppressions policy
+- ESLint v10 flat config with sourceType: script for IIFE module pattern
+- @eslint/js installed separately (not bundled with ESLint v10)
+- builtinGlobals: false for no-redeclare to allow IIFE var re-declarations
+- varsIgnorePattern for module names avoids no-unused-vars false positives
+- max-len 88 for JS matching Python ruff convention for cross-language consistency
+- Catch params prefixed with _ (e.g. _e) for caughtErrorsIgnorePattern
+
 ### Critical Context for v2.0
 
 - `DATA_DIR = Path("data")` in `pipeline/config.py` is a relative path — all tests must patch this via autouse fixture or they silently read/write live CSV files
@@ -83,6 +92,6 @@ None active.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed .planning/phases/12-python-unit-tests/12-02-PLAN.md
-Resume file: .planning/phases/12-python-unit-tests/12-02-SUMMARY.md
-Next action: Continue Phase 12 (additional plans if any) or proceed to Phase 13
+Stopped at: Completed Phase 13 (Linting Baseline) — both plans verified clean
+Resume file: .planning/phases/13-linting-baseline/13-02-SUMMARY.md
+Next action: Proceed to Phase 14 (Live Verification)

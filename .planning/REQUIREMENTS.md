@@ -25,10 +25,10 @@ Requirements for v2.0 Local CI & Test Infrastructure. Each maps to roadmap phase
 
 ### Linting
 
-- [ ] **LINT-01**: Python code passes ruff checks (E/F/W/B/I/UP rules)
-- [ ] **LINT-02**: Existing Python violations cleaned up in baseline commit
-- [ ] **LINT-03**: JavaScript code passes ESLint v10 checks (IIFE sourceType, browser globals)
-- [ ] **LINT-04**: Linting runnable via npm scripts (`lint:py`, `lint:js`, `lint`)
+- [x] **LINT-01**: Python code passes ruff checks (E/F/W/B/I/UP rules)
+- [x] **LINT-02**: Existing Python violations cleaned up in baseline commit
+- [x] **LINT-03**: JavaScript code passes ESLint v10 checks (IIFE sourceType, browser globals)
+- [x] **LINT-04**: Linting runnable via npm scripts (`lint:py`, `lint:js`, `lint`)
 
 ### Live Verification
 
@@ -79,10 +79,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UNIT-03 | Phase 12 | Complete |
 | UNIT-04 | Phase 12 | Complete |
 | UNIT-05 | Phase 12 | Complete |
-| LINT-01 | Phase 13 | Pending |
-| LINT-02 | Phase 13 | Pending |
-| LINT-03 | Phase 13 | Pending |
-| LINT-04 | Phase 13 | Pending |
+| LINT-01 | Phase 13 | Complete (13-01) |
+| LINT-02 | Phase 13 | Complete (13-01) |
+| LINT-03 | Phase 13 | Complete (13-02) |
+| LINT-04 | Phase 13 | Complete (13-02) |
 | LIVE-01 | Phase 14 | Pending |
 | LIVE-02 | Phase 14 | Pending |
 | LIVE-03 | Phase 14 | Pending |
@@ -99,4 +99,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-25 after Plan 11-01 execution (FOUND-01, FOUND-04, FOUND-05 complete)*
+*Last updated: 2026-02-25 after Phase 13 execution (LINT-01, LINT-02, LINT-03, LINT-04 complete)*
