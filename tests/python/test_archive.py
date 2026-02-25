@@ -6,7 +6,7 @@ TDD RED phase: these tests are written before the implementation.
 """
 
 import json
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -15,7 +15,6 @@ from pipeline.normalize.archive import (
     read_previous_snapshot,
     save_snapshot,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -136,7 +135,7 @@ class TestSaveSnapshot:
         """Save a snapshot and verify dated file + index.json are created."""
         save_snapshot(sample_status, snapshots_dir)
 
-        today = datetime.utcnow().strftime("%Y-%m-%d")
+        today = datetime.now(UTC).strftime("%Y-%m-%d")
         snapshot_file = snapshots_dir / f"{today}.json"
         index_file = snapshots_dir / "index.json"
 
@@ -159,7 +158,7 @@ class TestSaveSnapshot:
         with open(snapshots_dir / "index.json") as f:
             index = json.load(f)
 
-        today = datetime.utcnow().strftime("%Y-%m-%d")
+        today = datetime.now(UTC).strftime("%Y-%m-%d")
         assert index["snapshots"].count(today) == 1
 
     def test_rolling_cap(self, snapshots_dir, sample_status):
@@ -260,8 +259,8 @@ class TestReadPreviousSnapshot:
 
     def test_no_old_enough(self, snapshots_dir, sample_status):
         """Returns None when all snapshots younger than min_age_days."""
-        today = datetime.utcnow().strftime("%Y-%m-%d")
-        yesterday = (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
+        today = datetime.now(UTC).strftime("%Y-%m-%d")
+        yesterday = (datetime.now(UTC) - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Create two recent snapshots
         for date_str in [today, yesterday]:
@@ -277,7 +276,7 @@ class TestReadPreviousSnapshot:
 
     def test_returns_most_recent_eligible(self, snapshots_dir, sample_status):
         """With snapshots at ages 1, 7, 14 days, returns 7-day-old one."""
-        today = datetime.utcnow()
+        today = datetime.now(UTC)
         dates = {
             "recent": (today - timedelta(days=1)).strftime("%Y-%m-%d"),
             "eligible": (today - timedelta(days=7)).strftime("%Y-%m-%d"),
@@ -299,7 +298,7 @@ class TestReadPreviousSnapshot:
 
     def test_skips_missing_file(self, snapshots_dir, sample_status):
         """Index references a date but file is missing — skips gracefully."""
-        today = datetime.utcnow()
+        today = datetime.now(UTC)
         missing_date = (today - timedelta(days=7)).strftime("%Y-%m-%d")
         valid_date = (today - timedelta(days=14)).strftime("%Y-%m-%d")
 
