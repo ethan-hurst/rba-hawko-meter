@@ -49,3 +49,26 @@
 
 ---
 
+
+## v2.0 Local CI & Test Infrastructure (Shipped: 2026-02-25)
+
+**Phases completed:** 7 phases, 11 plans
+
+**Key accomplishments:**
+- Test foundation with pyproject.toml config hub + isolated test harness (autouse DATA_DIR/network fixtures, fixture CSVs from production snapshots)
+- 60+ pytest unit tests covering Z-score, gauge, ratios, CSV handler, and jsonschema validation — the full mathematical core guarded by deterministic tests
+- Dual-language linting baseline: Ruff (Python) + ESLint v10 (JS) at zero violations with unified npm scripts (lint:py, lint:js, lint)
+- Live verification suite: 9 @pytest.mark.live tests for all data sources + verify_summary.py ASCII table with exit code signalling
+- Lefthook pre-push quality gate running lint + unit tests in parallel, blocking broken pushes in <10s
+- DATA_DIR late-binding fix across 7 modules with environment variable override support
+
+**Stats:**
+- Timeline: 2026-02-24 → 2026-02-25 (2 days)
+- Commits: 64
+- Files modified: 95
+- Lines changed: +13,776 / -1,190
+- Codebase total: ~8,087 LOC (5,577 Python + 2,510 JS), 1,984 test LOC
+- Test suite: 60+ pytest unit tests + 9 live tests + 28 Playwright tests
+
+---
+

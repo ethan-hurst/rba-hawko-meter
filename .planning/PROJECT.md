@@ -43,15 +43,14 @@ Empowers laypeople to understand interest rate drivers without relying on media 
 - ✓ PIPE-03: CoreLogic/Cotality dwelling price scraping (HVI PDF media releases) — v1.1
 - ✓ PIPE-04: NAB capacity utilisation survey (HTML extraction + PDF fallback) — v1.1
 - ✓ HAWK-04: ASX Futures multi-meeting probability display — v1.1
+- ✓ FOUND-01 through FOUND-05: Test foundation (pyproject.toml, fixtures, isolation, tiering, dev deps) — v2.0
+- ✓ UNIT-01 through UNIT-05: Python unit tests (Z-score, gauge, ratios, CSV handler, schema) — v2.0
+- ✓ LINT-01 through LINT-04: Linting baseline (ruff + ESLint, zero violations, npm scripts) — v2.0
+- ✓ LIVE-01 through LIVE-04: Live verification (ABS/RBA/ASX APIs, scrapers, verify_summary.py) — v2.0
+- ✓ HOOK-01 through HOOK-04: Pre-push hook + unified npm scripts (test:fast, verify) — v2.0
 
 ### Active
-- [ ] Python unit test suite (pytest) for pipeline modules (ingest, normalize, Z-scores)
-- [ ] status.json data validation (all indicators present, values in range, timestamps valid)
-- [ ] Linting — Python (ruff) + JavaScript (ESLint)
-- [ ] Full pipeline verification with real API calls (ABS, RBA, ASX)
-- [ ] Live scraper verification (Cotality HVI, NAB capacity utilisation)
-- [ ] Pre-push git hook running fast test suite
-- [ ] Unified npm scripts for two-tier verification (fast + full)
+(No active requirements — next milestone not yet defined)
 
 ### Out of Scope
 | Feature | Reason |
@@ -62,7 +61,10 @@ Empowers laypeople to understand interest rate drivers without relying on media 
 | User accounts/login | Increases friction and privacy liability — stateless app preferred |
 | Opinionated blog/news | Violates "Data, not opinion" core value |
 | Real-time data updates | Weekly cadence is sufficient for macro indicators; real-time adds cost/complexity |
-| Mobile native app | Web-first, responsive design sufficient for v1 |
+| Mobile native app | Web-first, responsive design sufficient |
+| GitHub Actions CI test workflow | Local CI covers pre-push; GHA test integration is a future milestone |
+| Code coverage enforcement | Coverage gates are premature until test suite matures further |
+| Type checking (mypy) | Ruff catches most issues for this codebase size |
 
 ## Key Decisions
 | Decision | Rationale | Outcome |
@@ -83,25 +85,22 @@ Empowers laypeople to understand interest rate drivers without relying on media 
 | **URL discovery for NAB** | Tag archive pages list current surveys | ✓ Never construct URLs from date templates for current month |
 | **Adaptive min_quarters** | New indicators lack 20 quarters of history | ✓ Lower z-score threshold for limited data with LOW confidence badge |
 | **45-day staleness for NAB** | Monthly data needs tighter threshold than 90d default | ✓ Business Conditions card fires amber border at 45d |
-
-## Current Milestone: v2.0 Local CI & Test Infrastructure
-
-**Goal:** Nothing broken gets to GitHub. Two-tier verification — fast pre-push hook + full live verification on demand.
-
-**Target features:**
-- Python unit test suite (pytest) covering all pipeline modules
-- status.json data validation
-- Python (ruff) + JavaScript (ESLint) linting
-- Full pipeline verification with real API calls
-- Live scraper verification (Cotality, NAB)
-- Pre-push git hook for fast test gate
-- Unified npm scripts (`npm run test:fast`, `npm run verify`)
+| **pyproject.toml config hub** | Single source for pytest + ruff config | ✓ testpaths, pythonpath, markers, ruff rules all in one file |
+| **Autouse DATA_DIR isolation** | Tests must never read/write production data/ | ✓ monkeypatch + tmp_path autouse fixture |
+| **Socket-level network blocking** | Prevent accidental HTTP in unit tests | ✓ socket.socket monkeypatch raises RuntimeError |
+| **Robust median/MAD known-answer tests** | Hand-calculated derivations catch formula regressions | ✓ 60+ parametrized tests with documented math |
+| **jsonschema StrictValidator** | hawk_score must be Python int, not float | ✓ Custom type_checker enforces int constraint |
+| **ESLint v10 flat config** | No .eslintrc support in v10; IIFE modules need sourceType:script | ✓ Zero violations, max-len 88 matching Python |
+| **Lefthook parallel pre-push** | Lint + test in parallel for <10s gate | ✓ 3 parallel commands, 30s timeout, silent on success |
+| **Late-bound DATA_DIR** | Import-time binding breaks test isolation | ✓ All 7 modules use pipeline.config.DATA_DIR at call time |
+| **Three-tier npm verify** | Fast/live/Playwright as distinct tiers | ✓ verify:fast && verify:live && verify:playwright && verify_summary |
 
 ## Context
 
-Shipped v1.1 with ~6,276 LOC (3,227 Python + 3,049 JS).
-Tech stack: Python (pandas, numpy, requests, beautifulsoup4, pdfplumber), Vanilla JS, Tailwind CSS, Plotly.js, Decimal.js.
-28 Playwright tests (100% pass).
+Shipped v2.0 with ~8,087 LOC (5,577 Python + 2,510 JS) including 1,984 lines of test code.
+Tech stack: Python (pandas, numpy, requests, beautifulsoup4, pdfplumber, pytest, ruff), Vanilla JS (ESLint v10), Tailwind CSS, Plotly.js, Decimal.js.
+Test suite: 60+ pytest unit tests + 9 live tests + 28 Playwright tests (100% pass).
+Quality gate: Lefthook pre-push hook (lint + unit tests in <10s), three-tier npm verify.
 7 of 8 economic indicators active (ASX futures displayed separately as 8th). All data source gaps closed.
 Dashboard coverage: "Based on 7 of 8 indicators".
 Automated data updates: weekly pipeline (Monday) + daily ASX futures (weekdays) via GitHub Actions.
@@ -112,4 +111,4 @@ Automated data updates: weekly pipeline (Monday) + daily ASX futures (weekdays) 
 3. **Accurate:** ✓ All metrics normalized via ratios/Z-scores, no nominal currency values.
 
 ---
-*Last updated: 2026-02-24 after v2.0 milestone started*
+*Last updated: 2026-02-25 after v2.0 milestone completed*
