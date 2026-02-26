@@ -60,7 +60,7 @@ Delivered: Hero section DOM restructure with Inter font and zone-coloured border
 
 **Milestone Goal:** Transform the dashboard from a point-in-time snapshot into a momentum tracker that shows direction of change, enables organic sharing, and lays the foundation for newsletter-based monetization.
 
-- [ ] **Phase 24: Pipeline Temporal Layer** - Archive snapshots and inject delta fields into status.json
+- [x] **Phase 24: Pipeline Temporal Layer** - Archive snapshots and inject delta fields into status.json (completed 2026-02-25)
 - [ ] **Phase 25: Indicator Card UI** - Delta badges and sparklines on every indicator card
 - [ ] **Phase 26: Social Sharing** - OG meta tags and share button for organic distribution
 - [ ] **Phase 27: Historical Chart + Narrative** - Hawk score history chart and weekly change summary
@@ -161,7 +161,7 @@ Plans:
 | 21. Hero HTML Restructure | v4.0 | 1/1 | Complete | 2026-02-26 |
 | 22. Verdict Explanation Component | v4.0 | 1/1 | Complete | 2026-02-26 |
 | 23. Visual Polish and Animations | v4.0 | 1/1 | Complete | 2026-02-26 |
-| 24. Pipeline Temporal Layer | v5.0 | 0/? | Not started | - |
+| 24. Pipeline Temporal Layer | 2/2 | Complete    | 2026-02-26 | - |
 | 25. Indicator Card UI | v5.0 | 0/? | Not started | - |
 | 26. Social Sharing | v5.0 | 0/? | Not started | - |
 | 27. Historical Chart + Narrative | v5.0 | 0/? | Not started | - |
