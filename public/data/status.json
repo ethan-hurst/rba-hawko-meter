@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-02-26T06:41:08.994526Z",
+  "generated_at": "2026-02-27T06:37:47.852793Z",
   "pipeline_version": "1.0.0",
   "overall": {
     "hawk_score": 48.9,
@@ -19,7 +19,7 @@
       "weight": 0.25,
       "polarity": 1,
       "data_date": "2025-12-31",
-      "staleness_days": 57,
+      "staleness_days": 58,
       "confidence": "HIGH",
       "interpretation": "Inflation below long-run average",
       "history": [
@@ -47,7 +47,7 @@
       "weight": 0.15,
       "polarity": 1,
       "data_date": "2025-10-01",
-      "staleness_days": 148,
+      "staleness_days": 149,
       "confidence": "HIGH",
       "interpretation": "Wage growth significantly above long-run average",
       "history": [
@@ -75,7 +75,7 @@
       "weight": 0.15,
       "polarity": 1,
       "data_date": "2026-03-31",
-      "staleness_days": -33,
+      "staleness_days": -32,
       "confidence": "HIGH",
       "interpretation": "Labour market looser than historical average",
       "history": [
@@ -103,7 +103,7 @@
       "weight": 0.1,
       "polarity": 1,
       "data_date": "2025-12-31",
-      "staleness_days": 57,
+      "staleness_days": 58,
       "confidence": "HIGH",
       "interpretation": "Consumer spending above trend",
       "history": [
@@ -131,7 +131,7 @@
       "weight": 0.05,
       "polarity": 1,
       "data_date": "2025-12-31",
-      "staleness_days": 57,
+      "staleness_days": 58,
       "confidence": "HIGH",
       "interpretation": "Building approvals near trend",
       "history": [
@@ -184,7 +184,7 @@
       "hike": 0.0
     },
     "direction": "hold",
-    "data_date": "2026-02-26",
+    "data_date": "2026-02-27",
     "staleness_days": 0
   }
 }
